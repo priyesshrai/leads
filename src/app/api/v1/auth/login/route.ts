@@ -1,28 +1,55 @@
 import { login } from "@/src/lib/auth"
 import { isRateLimited } from "@/src/lib/limiter"
 import { loginSchema } from "@/src/types/auth"
+import { cookies } from "next/headers"
 import { NextResponse } from "next/server"
 
 export async function POST(req: Request) {
     try {
         const ip = req.headers.get("x-forwarded-for") || "unknown"
         if (isRateLimited(ip)) {
-            return NextResponse.json({ error: "Too many login attempts. Try again later." }, { status: 429 })
+            return NextResponse.json(
+                { error: "Too many login attempts. Try again later." },
+                { status: 429 }
+            )
         }
 
-        const body = await req.json()
+        const ct = req.headers.get('content-type') || ''
+        let body: any
+        if (ct.includes('application/json')) {
+            body = await req.json()
+        } else if (ct.includes('form')) {
+            const form = await req.formData()
+            body = { email: form.get('email'), password: form.get('password') }
+        } else {
+            return NextResponse.json({ error: 'Unsupported content type' }, { status: 415 })
+        }
+
         const parsed = loginSchema.safeParse(body)
         if (!parsed.success) {
             return NextResponse.json({ errors: parsed.error.flatten().fieldErrors }, { status: 400 })
         }
 
-        const { email, password } = parsed.data
-        const { token, user } = await login(email, password)
+        const email = parsed.data.email.toLowerCase().trim()
+        const password = parsed.data.password.trim()
 
-        const res = NextResponse.json({ success: true, user })
-        res.cookies.set("token", token, { httpOnly: true, secure: true, path: "/", maxAge: 86400 })
-        return res
+        const { token, user } = await login(email, password);
+
+        const cookieStore = await cookies()
+        cookieStore.set("token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
+            path: "/",
+            maxAge: 7 * 24 * 60 * 60,
+        })
+        return NextResponse.json({
+            success: true,
+            token: token,
+        }, { status: 200 })
+
     } catch (err: any) {
+        console.error("Login error:", err)
         return NextResponse.json({ error: err.message || "Invalid credentials" }, { status: 401 })
     }
 }
