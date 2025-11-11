@@ -56,12 +56,24 @@ export async function POST(req: Request) {
                 { status: 400 }
             )
         }
+        const formOwner = await prisma.user.findFirst({
+            where: { id: user.id }
+        })
+        const formCount = await prisma.form.count({
+            where: { userId: user.id },
+        })
+
+        const prefix = formOwner?.name.slice(0, 4).toUpperCase()
+        const formattedCount = String(formCount + 1).padStart(4, "0")
+        const datePart = new Date()
+        const uniqueId = `${prefix}-${formattedCount}-${datePart}`
 
         const result = await prisma.$transaction(async (tx) => {
             const newForm = await tx.form.create({
                 data: {
                     title: cleanTitle,
                     description: cleanDescription,
+                    formsId: uniqueId,
                     slug,
                     userId: user.id,
                     fields: {

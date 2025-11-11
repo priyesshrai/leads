@@ -26,6 +26,7 @@ export type AggregateForm = {
 
 export type FormMinAggregateOutputType = {
   id: string | null
+  formsId: string | null
   userId: string | null
   title: string | null
   description: string | null
@@ -35,6 +36,7 @@ export type FormMinAggregateOutputType = {
 
 export type FormMaxAggregateOutputType = {
   id: string | null
+  formsId: string | null
   userId: string | null
   title: string | null
   description: string | null
@@ -44,6 +46,7 @@ export type FormMaxAggregateOutputType = {
 
 export type FormCountAggregateOutputType = {
   id: number
+  formsId: number
   userId: number
   title: number
   description: number
@@ -55,6 +58,7 @@ export type FormCountAggregateOutputType = {
 
 export type FormMinAggregateInputType = {
   id?: true
+  formsId?: true
   userId?: true
   title?: true
   description?: true
@@ -64,6 +68,7 @@ export type FormMinAggregateInputType = {
 
 export type FormMaxAggregateInputType = {
   id?: true
+  formsId?: true
   userId?: true
   title?: true
   description?: true
@@ -73,6 +78,7 @@ export type FormMaxAggregateInputType = {
 
 export type FormCountAggregateInputType = {
   id?: true
+  formsId?: true
   userId?: true
   title?: true
   description?: true
@@ -155,6 +161,7 @@ export type FormGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
 
 export type FormGroupByOutputType = {
   id: string
+  formsId: string
   userId: string
   title: string
   description: string | null
@@ -185,6 +192,7 @@ export type FormWhereInput = {
   OR?: Prisma.FormWhereInput[]
   NOT?: Prisma.FormWhereInput | Prisma.FormWhereInput[]
   id?: Prisma.StringFilter<"Form"> | string
+  formsId?: Prisma.StringFilter<"Form"> | string
   userId?: Prisma.StringFilter<"Form"> | string
   title?: Prisma.StringFilter<"Form"> | string
   description?: Prisma.StringNullableFilter<"Form"> | string | null
@@ -197,6 +205,7 @@ export type FormWhereInput = {
 
 export type FormOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  formsId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -213,6 +222,7 @@ export type FormWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.FormWhereInput | Prisma.FormWhereInput[]
   OR?: Prisma.FormWhereInput[]
   NOT?: Prisma.FormWhereInput | Prisma.FormWhereInput[]
+  formsId?: Prisma.StringFilter<"Form"> | string
   userId?: Prisma.StringFilter<"Form"> | string
   title?: Prisma.StringFilter<"Form"> | string
   description?: Prisma.StringNullableFilter<"Form"> | string | null
@@ -224,6 +234,7 @@ export type FormWhereUniqueInput = Prisma.AtLeast<{
 
 export type FormOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  formsId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -239,6 +250,7 @@ export type FormScalarWhereWithAggregatesInput = {
   OR?: Prisma.FormScalarWhereWithAggregatesInput[]
   NOT?: Prisma.FormScalarWhereWithAggregatesInput | Prisma.FormScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Form"> | string
+  formsId?: Prisma.StringWithAggregatesFilter<"Form"> | string
   userId?: Prisma.StringWithAggregatesFilter<"Form"> | string
   title?: Prisma.StringWithAggregatesFilter<"Form"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"Form"> | string | null
@@ -248,6 +260,7 @@ export type FormScalarWhereWithAggregatesInput = {
 
 export type FormCreateInput = {
   id?: string
+  formsId: string
   title: string
   description?: string | null
   slug: string
@@ -259,6 +272,7 @@ export type FormCreateInput = {
 
 export type FormUncheckedCreateInput = {
   id?: string
+  formsId: string
   userId: string
   title: string
   description?: string | null
@@ -270,6 +284,7 @@ export type FormUncheckedCreateInput = {
 
 export type FormUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  formsId?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
@@ -281,6 +296,7 @@ export type FormUpdateInput = {
 
 export type FormUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  formsId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -292,6 +308,7 @@ export type FormUncheckedUpdateInput = {
 
 export type FormCreateManyInput = {
   id?: string
+  formsId: string
   userId: string
   title: string
   description?: string | null
@@ -301,6 +318,7 @@ export type FormCreateManyInput = {
 
 export type FormUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  formsId?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
@@ -309,6 +327,7 @@ export type FormUpdateManyMutationInput = {
 
 export type FormUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  formsId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -328,6 +347,7 @@ export type FormOrderByRelationAggregateInput = {
 
 export type FormCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  formsId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
@@ -337,6 +357,7 @@ export type FormCountOrderByAggregateInput = {
 
 export type FormMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  formsId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
@@ -346,6 +367,7 @@ export type FormMaxOrderByAggregateInput = {
 
 export type FormMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  formsId?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   description?: Prisma.SortOrder
@@ -430,6 +452,7 @@ export type FormUpdateOneRequiredWithoutResponsesNestedInput = {
 
 export type FormCreateWithoutUserInput = {
   id?: string
+  formsId: string
   title: string
   description?: string | null
   slug: string
@@ -440,6 +463,7 @@ export type FormCreateWithoutUserInput = {
 
 export type FormUncheckedCreateWithoutUserInput = {
   id?: string
+  formsId: string
   title: string
   description?: string | null
   slug: string
@@ -479,6 +503,7 @@ export type FormScalarWhereInput = {
   OR?: Prisma.FormScalarWhereInput[]
   NOT?: Prisma.FormScalarWhereInput | Prisma.FormScalarWhereInput[]
   id?: Prisma.StringFilter<"Form"> | string
+  formsId?: Prisma.StringFilter<"Form"> | string
   userId?: Prisma.StringFilter<"Form"> | string
   title?: Prisma.StringFilter<"Form"> | string
   description?: Prisma.StringNullableFilter<"Form"> | string | null
@@ -488,6 +513,7 @@ export type FormScalarWhereInput = {
 
 export type FormCreateWithoutFieldsInput = {
   id?: string
+  formsId: string
   title: string
   description?: string | null
   slug: string
@@ -498,6 +524,7 @@ export type FormCreateWithoutFieldsInput = {
 
 export type FormUncheckedCreateWithoutFieldsInput = {
   id?: string
+  formsId: string
   userId: string
   title: string
   description?: string | null
@@ -524,6 +551,7 @@ export type FormUpdateToOneWithWhereWithoutFieldsInput = {
 
 export type FormUpdateWithoutFieldsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  formsId?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
@@ -534,6 +562,7 @@ export type FormUpdateWithoutFieldsInput = {
 
 export type FormUncheckedUpdateWithoutFieldsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  formsId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -544,6 +573,7 @@ export type FormUncheckedUpdateWithoutFieldsInput = {
 
 export type FormCreateWithoutResponsesInput = {
   id?: string
+  formsId: string
   title: string
   description?: string | null
   slug: string
@@ -554,6 +584,7 @@ export type FormCreateWithoutResponsesInput = {
 
 export type FormUncheckedCreateWithoutResponsesInput = {
   id?: string
+  formsId: string
   userId: string
   title: string
   description?: string | null
@@ -580,6 +611,7 @@ export type FormUpdateToOneWithWhereWithoutResponsesInput = {
 
 export type FormUpdateWithoutResponsesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  formsId?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
@@ -590,6 +622,7 @@ export type FormUpdateWithoutResponsesInput = {
 
 export type FormUncheckedUpdateWithoutResponsesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  formsId?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -600,6 +633,7 @@ export type FormUncheckedUpdateWithoutResponsesInput = {
 
 export type FormCreateManyUserInput = {
   id?: string
+  formsId: string
   title: string
   description?: string | null
   slug: string
@@ -608,6 +642,7 @@ export type FormCreateManyUserInput = {
 
 export type FormUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  formsId?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
@@ -618,6 +653,7 @@ export type FormUpdateWithoutUserInput = {
 
 export type FormUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  formsId?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
@@ -628,6 +664,7 @@ export type FormUncheckedUpdateWithoutUserInput = {
 
 export type FormUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  formsId?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
@@ -676,6 +713,7 @@ export type FormCountOutputTypeCountResponsesArgs<ExtArgs extends runtime.Types.
 
 export type FormSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  formsId?: boolean
   userId?: boolean
   title?: boolean
   description?: boolean
@@ -689,6 +727,7 @@ export type FormSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
 
 export type FormSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  formsId?: boolean
   userId?: boolean
   title?: boolean
   description?: boolean
@@ -699,6 +738,7 @@ export type FormSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
 
 export type FormSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  formsId?: boolean
   userId?: boolean
   title?: boolean
   description?: boolean
@@ -709,6 +749,7 @@ export type FormSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
 
 export type FormSelectScalar = {
   id?: boolean
+  formsId?: boolean
   userId?: boolean
   title?: boolean
   description?: boolean
@@ -716,7 +757,7 @@ export type FormSelectScalar = {
   createdAt?: boolean
 }
 
-export type FormOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "title" | "description" | "slug" | "createdAt", ExtArgs["result"]["form"]>
+export type FormOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "formsId" | "userId" | "title" | "description" | "slug" | "createdAt", ExtArgs["result"]["form"]>
 export type FormInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   fields?: boolean | Prisma.Form$fieldsArgs<ExtArgs>
   responses?: boolean | Prisma.Form$responsesArgs<ExtArgs>
@@ -739,6 +780,7 @@ export type $FormPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
+    formsId: string
     userId: string
     title: string
     description: string | null
@@ -1171,6 +1213,7 @@ export interface Prisma__FormClient<T, Null = never, ExtArgs extends runtime.Typ
  */
 export interface FormFieldRefs {
   readonly id: Prisma.FieldRef<"Form", 'String'>
+  readonly formsId: Prisma.FieldRef<"Form", 'String'>
   readonly userId: Prisma.FieldRef<"Form", 'String'>
   readonly title: Prisma.FieldRef<"Form", 'String'>
   readonly description: Prisma.FieldRef<"Form", 'String'>

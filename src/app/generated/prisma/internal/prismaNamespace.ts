@@ -926,6 +926,7 @@ export type ManagedUserScalarFieldEnum = (typeof ManagedUserScalarFieldEnum)[key
 
 export const FormScalarFieldEnum = {
   id: 'id',
+  formsId: 'formsId',
   userId: 'userId',
   title: 'title',
   description: 'description',
