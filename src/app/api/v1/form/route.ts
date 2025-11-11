@@ -65,7 +65,7 @@ export async function POST(req: Request) {
 
         const prefix = formOwner?.name.slice(0, 4).toUpperCase()
         const formattedCount = String(formCount + 1).padStart(4, "0")
-        const datePart = new Date()
+        const datePart = new Date().toISOString()
         const uniqueId = `${prefix}-${formattedCount}-${datePart}`
 
         const result = await prisma.$transaction(async (tx) => {
