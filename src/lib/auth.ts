@@ -1,6 +1,8 @@
 import jwt from 'jsonwebtoken'
 import prisma from "./prisma"
 import bcrypt from "bcryptjs"
+import { cookies } from 'next/headers'
+import { AuthUser } from './verifySuperAdmin'
 
 const JWT_SECRET = process.env.JWT_SECRET!
 
@@ -22,5 +24,33 @@ export function verifyToken(token: string) {
         return jwt.verify(token, JWT_SECRET)
     } catch {
         throw new Error("Invalid token")
+    }
+}
+
+
+export async function VerifyAdmin() {
+    const cookieStore = await cookies()
+    const token = cookieStore.get("token")?.value
+
+    if (!token) {
+        throw new Error("No authentication token found")
+    }
+
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET) as AuthUser
+
+        if (decoded.role !== "ADMIN") {
+            throw new Error("Unauthorized: Only ADMIN access allowed")
+        }
+
+        return decoded
+    } catch (err: any) {
+        if (err.name === "TokenExpiredError") {
+            throw new Error("Session expired. Please log in again.")
+        }
+        if (err.name === "JsonWebTokenError") {
+            throw new Error("Invalid token. Authentication failed.")
+        }
+        throw new Error("Authentication error")
     }
 }
