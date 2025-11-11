@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { PrismaClient } from "@/src/app/generated/prisma/client"
 import { createFormSchema } from "@/src/types/form"
-import { VerifyAdmin, verifyToken } from "@/src/lib/auth"
+import { VerifyAdmin } from "@/src/lib/auth"
 import slugify from "slugify"
 
 
@@ -46,12 +46,18 @@ export async function POST(req: Request) {
         const slugBase = slugify(cleanTitle, { lower: true, strict: true })
         const slug = `${slugBase}-${Date.now()}`
 
-        const result = await prisma.$transaction(async (tx) => {
-            const existing = await tx.form.findFirst({
-                where: { userId: user.id, title: cleanTitle },
-            })
-            if (existing) return NextResponse.json({ error: "A form with this title already exists" }, { status: 400 })
+        const existing = await prisma.form.findFirst({
+            where: { userId: user.id, title: cleanTitle },
+        })
 
+        if (existing) {
+            return NextResponse.json(
+                { error: "A form with this title already exists" },
+                { status: 400 }
+            )
+        }
+
+        const result = await prisma.$transaction(async (tx) => {
             const newForm = await tx.form.create({
                 data: {
                     title: cleanTitle,

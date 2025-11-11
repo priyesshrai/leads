@@ -43,6 +43,51 @@ export const formFieldSchema = z
         }
     )
 
+export const updateFormFieldSchema = z
+    .object({
+        id:z.string().uuid().optional(),
+        label: z
+            .string({ error: "Label is required" })
+            .trim()
+            .min(1, "Label cannot be empty")
+            .max(100, "Label too long"),
+
+        type: z.enum([
+            "text",
+            "textarea",
+            "select",
+            "radio",
+            "checkbox",
+            "number",
+            "date",
+            "file",
+        ], { error: "Field type is required" }),
+
+        required: z.boolean().default(false),
+
+        options: z.array(
+            z.string()
+                .trim()
+                .min(1, "Option cannot be empty")
+                .max(50, "Option too long")
+        ).optional(),
+
+        order: z.number().int().min(0).optional(),
+    })
+    .refine(
+        (field) => {
+            if (["radio", "select", "checkbox"].includes(field.type)) {
+                return field.options && field.options.length > 0
+            }
+            return true
+        },
+        {
+            message: "Options are required for select, radio, and checkbox fields",
+            path: ["options"],
+        }
+    )
+
+
 export const createFormSchema = z.object({
     title: z
         .string({ error: "Form title is required" })
@@ -61,6 +106,11 @@ export const createFormSchema = z.object({
         .min(1, "At least one field is required")
         .max(100, "Too many fields in one form")
         .optional(),
+})
+export const updateFormSchema = z.object({
+    title: z.string().min(3, "Title is required"),
+    description: z.string().optional(),
+    fields: z.array(updateFormFieldSchema).optional(),
 })
 
 export type FormFieldsSchema = z.infer<typeof formFieldSchema>
