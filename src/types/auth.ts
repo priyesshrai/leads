@@ -30,3 +30,8 @@ export const userSchema = z.object({
 })
 export type LoginSchema = z.infer<typeof loginSchema>
 export type UserSchema = z.infer<typeof userSchema>
+
+export type LoginReturn = {
+  success: boolean;
+  token: string;
+}

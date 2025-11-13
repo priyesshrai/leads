@@ -3,7 +3,7 @@ import React from "react";
 export interface InputProps
     extends React.InputHTMLAttributes<HTMLInputElement> {
     label?: string;
-    error?: string;
+    error?: boolean;
     leftIcon?: React.ReactNode;
     rightIcon?: React.ReactNode;
 }
@@ -44,7 +44,6 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                     />
                 </div>
 
-                {error && <p className="text-sm text-red-500">{error}</p>}
             </div>
         );
     }

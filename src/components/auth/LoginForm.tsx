@@ -1,17 +1,19 @@
 'use client';
-import React, { ChangeEvent, useState } from 'react'
+import { ChangeEvent, FormEvent, useState } from 'react'
 import Input from '../ui/Input';
 import { Eye, EyeOff, Mail } from 'lucide-react';
-import { LoginSchema } from '@/src/types/auth';
+import { LoginReturn, LoginSchema } from '@/src/types/auth';
 import Link from 'next/link';
+import { useMutation } from '@tanstack/react-query';
+import axios from 'axios';
 
 export default function LoginForm() {
     const [showPassword, setShowPassword] = useState<boolean>(false);
+    const [disableButton, setDisableButton] = useState<boolean>(true);
     const [formValue, setFormValue] = useState<LoginSchema>({
         email: '',
         password: ''
     })
-
     function handleChange(e: ChangeEvent<HTMLInputElement>) {
         const { name, value } = e.target
         setFormValue((prevData) => (
@@ -20,10 +22,31 @@ export default function LoginForm() {
                 [name]: value
             }
         ))
+        setDisableButton(!(formValue.email !== '' && formValue.password !== ''));
+    }
+
+    const loginMutation = useMutation({
+        mutationFn: async (payload: LoginSchema): Promise<LoginReturn> => {
+            const response = await axios.post<LoginReturn>(
+                "/api/v1/auth/login",
+                payload,
+                { withCredentials: true }
+            );
+            return response.data;
+        },
+        onSuccess: () => {
+            setFormValue({ email: "", password: "" });
+        },
+    });
+    const { mutate, isPending, isError, error, isSuccess } = loginMutation;
+
+    function handleSubmit(e: FormEvent) {
+        e.preventDefault();
+        mutate(formValue);
     }
 
     return (
-        <form className="relative w-full flex flex-col gap-3">
+        <form className="relative w-full flex flex-col gap-3" onSubmit={handleSubmit}>
             <Input
                 value={formValue.email}
                 type="email"
@@ -32,7 +55,7 @@ export default function LoginForm() {
                 placeholder="Enter Email"
                 leftIcon={<Mail size={18} />}
                 onChange={handleChange}
-            // error={errors.email?.message}
+                error={isError}
             />
 
             <Input
@@ -54,12 +77,19 @@ export default function LoginForm() {
                 Forget password?
             </Link>
             <button
+                disabled={disableButton || isPending}
                 role='button'
-                className={`w-full bg-blue-600 py-2.5 text-white mt-3 rounded cursor-pointer font-medium text-lg `}
+                className={`w-full bg-blue-600 py-2.5 text-white mt-3 rounded font-medium text-lg ${disableButton ? 'cursor-not-allowed' : 'cursor-pointer'} `}
             >
-                Login
+                {isPending ? "Loading..." : 'Login'}
             </button>
+            {isError && (
+                <p className="text-red-500 text-sm mt-1">{(error as Error).message}</p>
+            )}
 
+            {isSuccess && (
+                <p className="text-green-500 text-sm mt-1">Login successful!</p>
+            )}
         </form>
     )
 }
