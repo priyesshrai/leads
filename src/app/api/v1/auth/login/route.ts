@@ -33,7 +33,11 @@ export async function POST(req: NextRequest) {
         const email = parsed.data.email.toLowerCase().trim()
         const password = parsed.data.password.trim()
 
-        const { token, user } = await login(email, password);
+        const result = await login(email, password)
+        if (typeof result === "string") {
+            return NextResponse.json({ error: result }, { status: 401 })
+        }
+        const { token, user } = result
 
         const cookieStore = await cookies()
         cookieStore.set("token", token, {
@@ -41,7 +45,7 @@ export async function POST(req: NextRequest) {
             secure: process.env.NODE_ENV === "production",
             sameSite: "lax",
             path: "/",
-            maxAge: 7 * 24 * 60 ,
+            maxAge: 7 * 24 * 60,
         })
         return NextResponse.json({
             success: true,

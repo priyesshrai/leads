@@ -44,6 +44,7 @@ export default function LoginForm() {
         e.preventDefault();
         mutate(formValue);
     }
+console.log(error);
 
     return (
         <form className="relative w-full flex flex-col gap-3" onSubmit={handleSubmit}>
