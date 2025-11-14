@@ -31,9 +31,8 @@ export async function POST(req: NextRequest) {
         }
 
         const email = parsed.data.email.toLowerCase().trim()
-        const password = parsed.data.password.trim()
 
-        const result = await login(email, password)
+        const result = await login(email, body.password)
         if (typeof result === "string") {
             return NextResponse.json({ error: result }, { status: 401 })
         }
