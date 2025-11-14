@@ -6,6 +6,7 @@ import { LoginReturn, LoginSchema } from '@/src/types/auth';
 import Link from 'next/link';
 import { useMutation } from '@tanstack/react-query';
 import axios, { AxiosError } from 'axios';
+import { redirect } from 'next/navigation';
 
 export default function LoginForm() {
     const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -36,6 +37,9 @@ export default function LoginForm() {
         },
         onSuccess: () => {
             setFormValue({ email: "", password: "" });
+            setTimeout(()=>{
+                redirect('/admin/dashboard')
+            },1500)
         },
     });
     const { mutate, isPending, isError, error, isSuccess } = loginMutation;

@@ -7,6 +7,7 @@ export const loginSchema = z.object({
     .email("Please enter a valid email address")
     .min(5, "Email must be at least 5 characters")
     .max(100, "Email too long"),
+    password:z.string().optional()
 })
 
 export const userSchema = z.object({

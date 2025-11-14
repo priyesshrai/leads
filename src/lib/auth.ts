@@ -18,10 +18,15 @@ export async function login(email: string, password: string) {
     })
     return { token, user }
 }
+export interface DecodedUser {
+    id: string;
+    role: "ADMIN" | "SUPERADMIN";
+    email: string
+}
 
-export function verifyToken(token: string) {
+export function verifyToken(token: string): DecodedUser | null {
     try {
-        return jwt.verify(token, JWT_SECRET)
+        return jwt.verify(token, JWT_SECRET) as DecodedUser
     } catch {
         throw new Error("Invalid token")
     }

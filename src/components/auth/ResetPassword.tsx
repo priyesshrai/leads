@@ -4,6 +4,7 @@ import Input from "../ui/Input";
 import { Eye, EyeOff } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
+import { redirect } from "next/navigation";
 
 export default function ResetPassword({ token }: { token: string }) {
     const [password, setPassword] = useState<string>('')
@@ -21,6 +22,9 @@ export default function ResetPassword({ token }: { token: string }) {
         },
         onSuccess: () => {
             setPassword('');
+            setTimeout(() => {
+                redirect('/login')
+            }, 1500)
         },
     });
     const { mutate, isPending, isError, error, isSuccess } = resetPasswordMutation;
