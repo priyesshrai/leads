@@ -9,7 +9,7 @@ export async function POST(req: Request) {
     const user = await prisma.user.findUnique({ where: { email } });
 
     if (!user) {
-        return NextResponse.json({ message: "If account exists, email sent." });
+        return NextResponse.json({ error: "Invalid email." }, { status: 404 });
     }
     const token = generateResetJwt(user.id);
     await prisma.user.update({
@@ -19,6 +19,7 @@ export async function POST(req: Request) {
             resetTokenExpiresAt: new Date(Date.now() + 1000 * 60 * 15)
         }
     });
-    await SendPasswordResetEmail(email, token);
-    return NextResponse.json({ message: "If account exists, email sent." });
+    const msg = await SendPasswordResetEmail(email, token);
+
+    return NextResponse.json({ message: msg }, { status: 200 });
 }

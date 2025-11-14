@@ -73,7 +73,7 @@ export default function LoginForm() {
                 }
                 onChange={handleChange}
             />
-            <Link href='/reset-password' className='ml-auto text-blue-400 '>
+            <Link href='/forget-password' className='ml-auto text-blue-400 '>
                 Forget password?
             </Link>
             <button
