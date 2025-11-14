@@ -5,7 +5,7 @@ import { Eye, EyeOff, Mail } from 'lucide-react';
 import { LoginReturn, LoginSchema } from '@/src/types/auth';
 import Link from 'next/link';
 import { useMutation } from '@tanstack/react-query';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 
 export default function LoginForm() {
     const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -44,7 +44,6 @@ export default function LoginForm() {
         e.preventDefault();
         mutate(formValue);
     }
-console.log(error);
 
     return (
         <form className="relative w-full flex flex-col gap-3" onSubmit={handleSubmit}>
@@ -85,7 +84,9 @@ console.log(error);
                 {isPending ? "Loading..." : 'Login'}
             </button>
             {isError && (
-                <p className="text-red-500 text-sm mt-1">{(error as Error).message}</p>
+                <p className="text-red-500 text-sm mt-1">
+                    {((error as AxiosError)?.response?.data as { error?: string })?.error || (error as Error).message}
+                </p>
             )}
 
             {isSuccess && (
