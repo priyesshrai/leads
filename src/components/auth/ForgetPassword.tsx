@@ -9,7 +9,7 @@ import { useMutation } from '@tanstack/react-query'
 export default function ForgetPassword() {
     const [email, setEmail] = useState<string>('')
 
-    const loginMutation = useMutation({
+    const passwordMutation = useMutation({
         mutationFn: async (payload: string): Promise<string> => {
             const response = await axios.post(
                 "/api/v1/auth/forget-password",
@@ -21,7 +21,7 @@ export default function ForgetPassword() {
             setEmail('');
         },
     });
-    const { mutate, isPending, isError, error, isSuccess } = loginMutation;
+    const { mutate, isPending, isError, error, isSuccess } = passwordMutation;
 
     function handleSubmit(e: FormEvent) {
         e.preventDefault();
@@ -48,7 +48,7 @@ export default function ForgetPassword() {
                 role='button'
                 className={`w-full bg-blue-600 py-2.5 text-white mt-3 rounded font-medium text-lg ${isPending ? 'cursor-not-allowed' : 'cursor-pointer'} `}
             >
-                {isPending ? "Loading..." : 'Login'}
+                {isPending ? "Loading..." : 'Reset'}
             </button>
             {isError && (
                 <p className="text-red-500 text-sm mt-1">

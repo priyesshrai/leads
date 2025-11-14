@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 import { verifyResetJwt } from "@/src/lib/resetJwt";
 
 export async function POST(req: Request) {
-    const { token, newPassword } = await req.json();
+    const { token, password } = await req.json();
 
     const payload = verifyResetJwt(token);
     if (!payload) {
@@ -25,7 +25,7 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "Invalid or expired token" }, { status: 400 });
     }
 
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     await prisma.user.update({
         where: { id: user.id },
@@ -36,5 +36,5 @@ export async function POST(req: Request) {
         }
     });
 
-    return NextResponse.json({ message: "Password reset successful" });
+    return NextResponse.json({ message: "Password reset successful" }, { status: 201 });
 }
