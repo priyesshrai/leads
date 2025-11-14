@@ -1,11 +1,10 @@
-import { PrismaClient } from "@/src/app/generated/prisma/client"
 import { isRateLimited } from "@/src/lib/limiter"
+import prisma from "@/src/lib/prisma"
 import { verifySuperAdmin } from "@/src/lib/verifySuperAdmin"
 import { userSchema } from "@/src/types/auth"
 import bcrypt from 'bcryptjs'
 import { NextRequest, NextResponse } from "next/server"
 
-const prisma = new PrismaClient()
 
 export async function POST(req: NextRequest) {
     try {

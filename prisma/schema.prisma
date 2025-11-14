@@ -15,17 +15,19 @@ enum Role {
 }
 
 model User {
-  id            String        @id @default(uuid())
-  name          String
-  email         String        @unique
-  password      String
-  role          Role          @default(ADMIN)
-  createdById   String?
-  createdBy     User?         @relation("CreatedAdmins", fields: [createdById], references: [id])
-  createdAdmins User[]        @relation("CreatedAdmins")
-  managedUsers  ManagedUser[]
-  forms         Form[]
-  createdAt     DateTime      @default(now())
+  id                  String        @id @default(uuid())
+  name                String
+  email               String        @unique
+  password            String
+  role                Role          @default(ADMIN)
+  createdById         String?
+  createdBy           User?         @relation("CreatedAdmins", fields: [createdById], references: [id])
+  createdAdmins       User[]        @relation("CreatedAdmins")
+  managedUsers        ManagedUser[]
+  forms               Form[]
+  resetToken          String?
+  resetTokenExpiresAt DateTime?
+  createdAt           DateTime      @default(now())
 }
 
 model ManagedUser {
