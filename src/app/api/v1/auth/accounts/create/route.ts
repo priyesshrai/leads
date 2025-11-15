@@ -60,7 +60,9 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        const existingAccount = await prisma.account.findUnique({ where: { email } });
+        const existingAccount = await prisma.account.findUnique({
+            where: { email }
+        });        
         if (existingAccount) {
             return NextResponse.json({ error: "Account with this email already exists" }, { status: 409 });
         }

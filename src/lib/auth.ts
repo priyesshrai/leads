@@ -18,6 +18,7 @@ export async function login(email: string, password: string) {
     })
     return { token, user }
 }
+
 export interface DecodedUser {
     id: string;
     role: "ADMIN" | "SUPERADMIN";
