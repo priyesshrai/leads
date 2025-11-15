@@ -1,67 +1,69 @@
-import { isRateLimited } from "@/src/lib/limiter"
-import prisma from "@/src/lib/prisma"
-import { verifySuperAdmin } from "@/src/lib/verifySuperAdmin"
-import { userSchema } from "@/src/types/auth"
-import bcrypt from 'bcryptjs'
-import { NextRequest, NextResponse } from "next/server"
+import { isRateLimited } from "@/src/lib/limiter";
+import prisma from "@/src/lib/prisma";
+import { verifyRole } from "@/src/lib/verifyRole";
+import { NextRequest, NextResponse } from "next/server";
 
-
-export async function POST(req: NextRequest) {
+export async function GET(req: NextRequest) {
     try {
-        const ip = req.headers.get("x-forwarded-for") || "unknown"
+        const ip = req.headers.get("x-forwarded-for") || "unknown";
         if (isRateLimited(ip)) {
             return NextResponse.json(
-                { error: "Too many login attempts. Try again later." },
+                { error: "Too many requests. Try again later." },
                 { status: 429 }
-            )
+            );
         }
 
-        const user = await verifySuperAdmin()
+        await verifyRole("SUPERADMIN");
 
-        const ct = req.headers.get('content-type') || ''
-        let body: any
-        if (ct.includes('application/json')) {
-            body = await req.json()
-        } else if (ct.includes('form')) {
-            const form = await req.formData()
-            body = { email: form.get('email'), password: form.get('password') }
-        } else {
-            return NextResponse.json({ error: 'Unsupported content type' }, { status: 415 })
-        }
+        const { searchParams } = new URL(req.url);
+        const page = Math.max(Number(searchParams.get("page")) || 1, 1);
+        const limit = Math.min(Math.max(Number(searchParams.get("limit")) || 10, 1), 50);
+        const skip = (page - 1) * limit;
 
-        const parsed = userSchema.safeParse(body)
-        if (!parsed.success) {
-            return NextResponse.json({ errors: parsed.error.flatten().fieldErrors }, { status: 400 })
-        }
-
-        const email = parsed.data.email.toLowerCase().trim()
-        const password = parsed.data.password.trim()
-
-        const existing = await prisma.user.findUnique({
-            where: { email: email },
-        })
-
-        if (existing) {
-            return NextResponse.json({ error: "Email already exists" }, { status: 409 })
-        }
-        const hashed = await bcrypt.hash(password, 10)
-
-        const newAdmin = await prisma.user.create({
-            data: {
-                name: body.name,
-                email: body.email.toLowerCase(),
-                password: hashed,
-                role: "ADMIN",
-                createdById: user.id,
+        const users = await prisma.user.findMany({
+            skip,
+            take: limit,
+            orderBy: { createdAt: "desc" },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true,
+                accountId: true,
+                createdAt: true,
             },
-        })
-        if (!newAdmin) {
-            return NextResponse.json({ error: "Can't create the user" }, { status: 500 });
-        }
-        return NextResponse.json({ success: true, message: 'User Created successfully' }, { status: 201 })
+        });
 
-    } catch (err: any) {
-        console.error("Login error:", err)
-        return NextResponse.json({ error: err.message || "Invalid credentials" }, { status: 401 })
+        const totalUsers = await prisma.user.count();
+
+        if (users.length === 0) {
+            return NextResponse.json(
+                { message: "No users found. Please create one now." },
+                { status: 200 }
+            );
+        }
+
+        const pageCount = Math.ceil(totalUsers / limit);
+        const response = {
+            users,
+            page,
+            limit,
+            totalUsers,
+            pageCount,
+            hasMore: page < pageCount,
+            nextPage: page < pageCount ? page + 1 : null,
+            prevPage: page > 1 ? page - 1 : null,
+        };
+        return NextResponse.json(
+            response,
+            { status: 200 }
+        );
+    } catch (error: any) {
+        console.error("GET /users error:", error.message);
+
+        return NextResponse.json(
+            { error: "Internal server error" },
+            { status: 500 }
+        );
     }
 }
