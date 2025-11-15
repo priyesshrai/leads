@@ -7,12 +7,12 @@ export const loginSchema = z.object({
     .email("Please enter a valid email address")
     .min(5, "Email must be at least 5 characters")
     .max(100, "Email too long"),
-    password:z.string().optional()
+  password: z.string().optional()
 })
 
-export const userSchema = z.object({
+export const createAccountUserSchema = z.object({
   name: z
-    .string({ message: "Name is required" })
+    .string({ message: "Contact person name is required" })
     .trim()
     .min(2, "Name must be at least 2 characters long")
     .max(50, "Name too long"),
@@ -31,10 +31,29 @@ export const userSchema = z.object({
     .max(64, "Password too long")
     .regex(/[A-Z]/, "Password must contain an uppercase letter")
     .regex(/[a-z]/, "Password must contain a lowercase letter")
-    .regex(/[0-9]/, "Password must contain a number")
-})
+    .regex(/[0-9]/, "Password must contain a number"),
+
+  businessName: z
+    .string({ message: "Business name is required" })
+    .trim()
+    .min(2, "Business name must be at least 2 characters"),
+
+  phone: z
+    .string()
+    .trim()
+    .min(10, "Phone number must be at least 10 digits")
+    .max(15, "Phone number too long")
+    .optional(),
+
+  location: z
+    .string()
+    .trim()
+    .max(200, "Location too long")
+    .optional(),
+});
+
 export type LoginSchema = z.infer<typeof loginSchema>
-export type UserSchema = z.infer<typeof userSchema>
+export type UserSchema = z.infer<typeof createAccountUserSchema>
 
 export type LoginReturn = {
   success: boolean;

@@ -19,7 +19,7 @@ model Account {
   businessName String?
   phone        String?
   location     String?
-  email        String?
+  email        String  @unique
 
   users User[]
   forms Form[]

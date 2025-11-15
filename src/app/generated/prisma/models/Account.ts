@@ -158,7 +158,7 @@ export type AccountGroupByOutputType = {
   businessName: string | null
   phone: string | null
   location: string | null
-  email: string | null
+  email: string
   createdAt: Date
   _count: AccountCountAggregateOutputType | null
   _min: AccountMinAggregateOutputType | null
@@ -188,7 +188,7 @@ export type AccountWhereInput = {
   businessName?: Prisma.StringNullableFilter<"Account"> | string | null
   phone?: Prisma.StringNullableFilter<"Account"> | string | null
   location?: Prisma.StringNullableFilter<"Account"> | string | null
-  email?: Prisma.StringNullableFilter<"Account"> | string | null
+  email?: Prisma.StringFilter<"Account"> | string
   createdAt?: Prisma.DateTimeFilter<"Account"> | Date | string
   users?: Prisma.UserListRelationFilter
   forms?: Prisma.FormListRelationFilter
@@ -199,7 +199,7 @@ export type AccountOrderByWithRelationInput = {
   businessName?: Prisma.SortOrderInput | Prisma.SortOrder
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
   location?: Prisma.SortOrderInput | Prisma.SortOrder
-  email?: Prisma.SortOrderInput | Prisma.SortOrder
+  email?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   users?: Prisma.UserOrderByRelationAggregateInput
   forms?: Prisma.FormOrderByRelationAggregateInput
@@ -207,24 +207,24 @@ export type AccountOrderByWithRelationInput = {
 
 export type AccountWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  email?: string
   AND?: Prisma.AccountWhereInput | Prisma.AccountWhereInput[]
   OR?: Prisma.AccountWhereInput[]
   NOT?: Prisma.AccountWhereInput | Prisma.AccountWhereInput[]
   businessName?: Prisma.StringNullableFilter<"Account"> | string | null
   phone?: Prisma.StringNullableFilter<"Account"> | string | null
   location?: Prisma.StringNullableFilter<"Account"> | string | null
-  email?: Prisma.StringNullableFilter<"Account"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Account"> | Date | string
   users?: Prisma.UserListRelationFilter
   forms?: Prisma.FormListRelationFilter
-}, "id">
+}, "id" | "email">
 
 export type AccountOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   businessName?: Prisma.SortOrderInput | Prisma.SortOrder
   phone?: Prisma.SortOrderInput | Prisma.SortOrder
   location?: Prisma.SortOrderInput | Prisma.SortOrder
-  email?: Prisma.SortOrderInput | Prisma.SortOrder
+  email?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.AccountCountOrderByAggregateInput
   _max?: Prisma.AccountMaxOrderByAggregateInput
@@ -239,7 +239,7 @@ export type AccountScalarWhereWithAggregatesInput = {
   businessName?: Prisma.StringNullableWithAggregatesFilter<"Account"> | string | null
   phone?: Prisma.StringNullableWithAggregatesFilter<"Account"> | string | null
   location?: Prisma.StringNullableWithAggregatesFilter<"Account"> | string | null
-  email?: Prisma.StringNullableWithAggregatesFilter<"Account"> | string | null
+  email?: Prisma.StringWithAggregatesFilter<"Account"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Account"> | Date | string
 }
 
@@ -248,7 +248,7 @@ export type AccountCreateInput = {
   businessName?: string | null
   phone?: string | null
   location?: string | null
-  email?: string | null
+  email: string
   createdAt?: Date | string
   users?: Prisma.UserCreateNestedManyWithoutAccountInput
   forms?: Prisma.FormCreateNestedManyWithoutAccountInput
@@ -259,7 +259,7 @@ export type AccountUncheckedCreateInput = {
   businessName?: string | null
   phone?: string | null
   location?: string | null
-  email?: string | null
+  email: string
   createdAt?: Date | string
   users?: Prisma.UserUncheckedCreateNestedManyWithoutAccountInput
   forms?: Prisma.FormUncheckedCreateNestedManyWithoutAccountInput
@@ -270,7 +270,7 @@ export type AccountUpdateInput = {
   businessName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   users?: Prisma.UserUpdateManyWithoutAccountNestedInput
   forms?: Prisma.FormUpdateManyWithoutAccountNestedInput
@@ -281,7 +281,7 @@ export type AccountUncheckedUpdateInput = {
   businessName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   users?: Prisma.UserUncheckedUpdateManyWithoutAccountNestedInput
   forms?: Prisma.FormUncheckedUpdateManyWithoutAccountNestedInput
@@ -292,7 +292,7 @@ export type AccountCreateManyInput = {
   businessName?: string | null
   phone?: string | null
   location?: string | null
-  email?: string | null
+  email: string
   createdAt?: Date | string
 }
 
@@ -301,7 +301,7 @@ export type AccountUpdateManyMutationInput = {
   businessName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -310,7 +310,7 @@ export type AccountUncheckedUpdateManyInput = {
   businessName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -398,7 +398,7 @@ export type AccountCreateWithoutUsersInput = {
   businessName?: string | null
   phone?: string | null
   location?: string | null
-  email?: string | null
+  email: string
   createdAt?: Date | string
   forms?: Prisma.FormCreateNestedManyWithoutAccountInput
 }
@@ -408,7 +408,7 @@ export type AccountUncheckedCreateWithoutUsersInput = {
   businessName?: string | null
   phone?: string | null
   location?: string | null
-  email?: string | null
+  email: string
   createdAt?: Date | string
   forms?: Prisma.FormUncheckedCreateNestedManyWithoutAccountInput
 }
@@ -434,7 +434,7 @@ export type AccountUpdateWithoutUsersInput = {
   businessName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   forms?: Prisma.FormUpdateManyWithoutAccountNestedInput
 }
@@ -444,7 +444,7 @@ export type AccountUncheckedUpdateWithoutUsersInput = {
   businessName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   forms?: Prisma.FormUncheckedUpdateManyWithoutAccountNestedInput
 }
@@ -454,7 +454,7 @@ export type AccountCreateWithoutFormsInput = {
   businessName?: string | null
   phone?: string | null
   location?: string | null
-  email?: string | null
+  email: string
   createdAt?: Date | string
   users?: Prisma.UserCreateNestedManyWithoutAccountInput
 }
@@ -464,7 +464,7 @@ export type AccountUncheckedCreateWithoutFormsInput = {
   businessName?: string | null
   phone?: string | null
   location?: string | null
-  email?: string | null
+  email: string
   createdAt?: Date | string
   users?: Prisma.UserUncheckedCreateNestedManyWithoutAccountInput
 }
@@ -490,7 +490,7 @@ export type AccountUpdateWithoutFormsInput = {
   businessName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   users?: Prisma.UserUpdateManyWithoutAccountNestedInput
 }
@@ -500,7 +500,7 @@ export type AccountUncheckedUpdateWithoutFormsInput = {
   businessName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   location?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   users?: Prisma.UserUncheckedUpdateManyWithoutAccountNestedInput
 }
@@ -604,7 +604,7 @@ export type $AccountPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     businessName: string | null
     phone: string | null
     location: string | null
-    email: string | null
+    email: string
     createdAt: Date
   }, ExtArgs["result"]["account"]>
   composites: {}
@@ -1255,7 +1255,7 @@ export type AccountCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   /**
    * The data needed to create a Account.
    */
-  data?: Prisma.XOR<Prisma.AccountCreateInput, Prisma.AccountUncheckedCreateInput>
+  data: Prisma.XOR<Prisma.AccountCreateInput, Prisma.AccountUncheckedCreateInput>
 }
 
 /**
