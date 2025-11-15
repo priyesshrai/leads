@@ -49,6 +49,7 @@ export const AnyNull = runtime.objectEnumValues.instances.AnyNull
 
 
 export const ModelName = {
+  Account: 'Account',
   User: 'User',
   ManagedUser: 'ManagedUser',
   Form: 'Form',
@@ -73,6 +74,18 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
 
+export const AccountScalarFieldEnum = {
+  id: 'id',
+  businessName: 'businessName',
+  phone: 'phone',
+  location: 'location',
+  email: 'email',
+  createdAt: 'createdAt'
+} as const
+
+export type AccountScalarFieldEnum = (typeof AccountScalarFieldEnum)[keyof typeof AccountScalarFieldEnum]
+
+
 export const UserScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -80,6 +93,7 @@ export const UserScalarFieldEnum = {
   password: 'password',
   role: 'role',
   createdById: 'createdById',
+  accountId: 'accountId',
   resetToken: 'resetToken',
   resetTokenExpiresAt: 'resetTokenExpiresAt',
   createdAt: 'createdAt'
@@ -108,7 +122,8 @@ export const FormScalarFieldEnum = {
   title: 'title',
   description: 'description',
   slug: 'slug',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  accountId: 'accountId'
 } as const
 
 export type FormScalarFieldEnum = (typeof FormScalarFieldEnum)[keyof typeof FormScalarFieldEnum]

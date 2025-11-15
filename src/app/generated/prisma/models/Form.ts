@@ -32,6 +32,7 @@ export type FormMinAggregateOutputType = {
   description: string | null
   slug: string | null
   createdAt: Date | null
+  accountId: string | null
 }
 
 export type FormMaxAggregateOutputType = {
@@ -42,6 +43,7 @@ export type FormMaxAggregateOutputType = {
   description: string | null
   slug: string | null
   createdAt: Date | null
+  accountId: string | null
 }
 
 export type FormCountAggregateOutputType = {
@@ -52,6 +54,7 @@ export type FormCountAggregateOutputType = {
   description: number
   slug: number
   createdAt: number
+  accountId: number
   _all: number
 }
 
@@ -64,6 +67,7 @@ export type FormMinAggregateInputType = {
   description?: true
   slug?: true
   createdAt?: true
+  accountId?: true
 }
 
 export type FormMaxAggregateInputType = {
@@ -74,6 +78,7 @@ export type FormMaxAggregateInputType = {
   description?: true
   slug?: true
   createdAt?: true
+  accountId?: true
 }
 
 export type FormCountAggregateInputType = {
@@ -84,6 +89,7 @@ export type FormCountAggregateInputType = {
   description?: true
   slug?: true
   createdAt?: true
+  accountId?: true
   _all?: true
 }
 
@@ -167,6 +173,7 @@ export type FormGroupByOutputType = {
   description: string | null
   slug: string
   createdAt: Date
+  accountId: string | null
   _count: FormCountAggregateOutputType | null
   _min: FormMinAggregateOutputType | null
   _max: FormMaxAggregateOutputType | null
@@ -198,9 +205,11 @@ export type FormWhereInput = {
   description?: Prisma.StringNullableFilter<"Form"> | string | null
   slug?: Prisma.StringFilter<"Form"> | string
   createdAt?: Prisma.DateTimeFilter<"Form"> | Date | string
+  accountId?: Prisma.StringNullableFilter<"Form"> | string | null
   fields?: Prisma.FormFieldListRelationFilter
   responses?: Prisma.ResponseListRelationFilter
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  account?: Prisma.XOR<Prisma.AccountNullableScalarRelationFilter, Prisma.AccountWhereInput> | null
 }
 
 export type FormOrderByWithRelationInput = {
@@ -211,9 +220,11 @@ export type FormOrderByWithRelationInput = {
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   slug?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  accountId?: Prisma.SortOrderInput | Prisma.SortOrder
   fields?: Prisma.FormFieldOrderByRelationAggregateInput
   responses?: Prisma.ResponseOrderByRelationAggregateInput
   user?: Prisma.UserOrderByWithRelationInput
+  account?: Prisma.AccountOrderByWithRelationInput
 }
 
 export type FormWhereUniqueInput = Prisma.AtLeast<{
@@ -227,9 +238,11 @@ export type FormWhereUniqueInput = Prisma.AtLeast<{
   title?: Prisma.StringFilter<"Form"> | string
   description?: Prisma.StringNullableFilter<"Form"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Form"> | Date | string
+  accountId?: Prisma.StringNullableFilter<"Form"> | string | null
   fields?: Prisma.FormFieldListRelationFilter
   responses?: Prisma.ResponseListRelationFilter
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  account?: Prisma.XOR<Prisma.AccountNullableScalarRelationFilter, Prisma.AccountWhereInput> | null
 }, "id" | "slug">
 
 export type FormOrderByWithAggregationInput = {
@@ -240,6 +253,7 @@ export type FormOrderByWithAggregationInput = {
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   slug?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  accountId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.FormCountOrderByAggregateInput
   _max?: Prisma.FormMaxOrderByAggregateInput
   _min?: Prisma.FormMinOrderByAggregateInput
@@ -256,6 +270,7 @@ export type FormScalarWhereWithAggregatesInput = {
   description?: Prisma.StringNullableWithAggregatesFilter<"Form"> | string | null
   slug?: Prisma.StringWithAggregatesFilter<"Form"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Form"> | Date | string
+  accountId?: Prisma.StringNullableWithAggregatesFilter<"Form"> | string | null
 }
 
 export type FormCreateInput = {
@@ -268,6 +283,7 @@ export type FormCreateInput = {
   fields?: Prisma.FormFieldCreateNestedManyWithoutFormInput
   responses?: Prisma.ResponseCreateNestedManyWithoutFormInput
   user: Prisma.UserCreateNestedOneWithoutFormsInput
+  account?: Prisma.AccountCreateNestedOneWithoutFormsInput
 }
 
 export type FormUncheckedCreateInput = {
@@ -278,6 +294,7 @@ export type FormUncheckedCreateInput = {
   description?: string | null
   slug: string
   createdAt?: Date | string
+  accountId?: string | null
   fields?: Prisma.FormFieldUncheckedCreateNestedManyWithoutFormInput
   responses?: Prisma.ResponseUncheckedCreateNestedManyWithoutFormInput
 }
@@ -292,6 +309,7 @@ export type FormUpdateInput = {
   fields?: Prisma.FormFieldUpdateManyWithoutFormNestedInput
   responses?: Prisma.ResponseUpdateManyWithoutFormNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutFormsNestedInput
+  account?: Prisma.AccountUpdateOneWithoutFormsNestedInput
 }
 
 export type FormUncheckedUpdateInput = {
@@ -302,6 +320,7 @@ export type FormUncheckedUpdateInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fields?: Prisma.FormFieldUncheckedUpdateManyWithoutFormNestedInput
   responses?: Prisma.ResponseUncheckedUpdateManyWithoutFormNestedInput
 }
@@ -314,6 +333,7 @@ export type FormCreateManyInput = {
   description?: string | null
   slug: string
   createdAt?: Date | string
+  accountId?: string | null
 }
 
 export type FormUpdateManyMutationInput = {
@@ -333,6 +353,7 @@ export type FormUncheckedUpdateManyInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type FormListRelationFilter = {
@@ -353,6 +374,7 @@ export type FormCountOrderByAggregateInput = {
   description?: Prisma.SortOrder
   slug?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  accountId?: Prisma.SortOrder
 }
 
 export type FormMaxOrderByAggregateInput = {
@@ -363,6 +385,7 @@ export type FormMaxOrderByAggregateInput = {
   description?: Prisma.SortOrder
   slug?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  accountId?: Prisma.SortOrder
 }
 
 export type FormMinOrderByAggregateInput = {
@@ -373,11 +396,54 @@ export type FormMinOrderByAggregateInput = {
   description?: Prisma.SortOrder
   slug?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+  accountId?: Prisma.SortOrder
 }
 
 export type FormScalarRelationFilter = {
   is?: Prisma.FormWhereInput
   isNot?: Prisma.FormWhereInput
+}
+
+export type FormCreateNestedManyWithoutAccountInput = {
+  create?: Prisma.XOR<Prisma.FormCreateWithoutAccountInput, Prisma.FormUncheckedCreateWithoutAccountInput> | Prisma.FormCreateWithoutAccountInput[] | Prisma.FormUncheckedCreateWithoutAccountInput[]
+  connectOrCreate?: Prisma.FormCreateOrConnectWithoutAccountInput | Prisma.FormCreateOrConnectWithoutAccountInput[]
+  createMany?: Prisma.FormCreateManyAccountInputEnvelope
+  connect?: Prisma.FormWhereUniqueInput | Prisma.FormWhereUniqueInput[]
+}
+
+export type FormUncheckedCreateNestedManyWithoutAccountInput = {
+  create?: Prisma.XOR<Prisma.FormCreateWithoutAccountInput, Prisma.FormUncheckedCreateWithoutAccountInput> | Prisma.FormCreateWithoutAccountInput[] | Prisma.FormUncheckedCreateWithoutAccountInput[]
+  connectOrCreate?: Prisma.FormCreateOrConnectWithoutAccountInput | Prisma.FormCreateOrConnectWithoutAccountInput[]
+  createMany?: Prisma.FormCreateManyAccountInputEnvelope
+  connect?: Prisma.FormWhereUniqueInput | Prisma.FormWhereUniqueInput[]
+}
+
+export type FormUpdateManyWithoutAccountNestedInput = {
+  create?: Prisma.XOR<Prisma.FormCreateWithoutAccountInput, Prisma.FormUncheckedCreateWithoutAccountInput> | Prisma.FormCreateWithoutAccountInput[] | Prisma.FormUncheckedCreateWithoutAccountInput[]
+  connectOrCreate?: Prisma.FormCreateOrConnectWithoutAccountInput | Prisma.FormCreateOrConnectWithoutAccountInput[]
+  upsert?: Prisma.FormUpsertWithWhereUniqueWithoutAccountInput | Prisma.FormUpsertWithWhereUniqueWithoutAccountInput[]
+  createMany?: Prisma.FormCreateManyAccountInputEnvelope
+  set?: Prisma.FormWhereUniqueInput | Prisma.FormWhereUniqueInput[]
+  disconnect?: Prisma.FormWhereUniqueInput | Prisma.FormWhereUniqueInput[]
+  delete?: Prisma.FormWhereUniqueInput | Prisma.FormWhereUniqueInput[]
+  connect?: Prisma.FormWhereUniqueInput | Prisma.FormWhereUniqueInput[]
+  update?: Prisma.FormUpdateWithWhereUniqueWithoutAccountInput | Prisma.FormUpdateWithWhereUniqueWithoutAccountInput[]
+  updateMany?: Prisma.FormUpdateManyWithWhereWithoutAccountInput | Prisma.FormUpdateManyWithWhereWithoutAccountInput[]
+  deleteMany?: Prisma.FormScalarWhereInput | Prisma.FormScalarWhereInput[]
+}
+
+export type FormUncheckedUpdateManyWithoutAccountNestedInput = {
+  create?: Prisma.XOR<Prisma.FormCreateWithoutAccountInput, Prisma.FormUncheckedCreateWithoutAccountInput> | Prisma.FormCreateWithoutAccountInput[] | Prisma.FormUncheckedCreateWithoutAccountInput[]
+  connectOrCreate?: Prisma.FormCreateOrConnectWithoutAccountInput | Prisma.FormCreateOrConnectWithoutAccountInput[]
+  upsert?: Prisma.FormUpsertWithWhereUniqueWithoutAccountInput | Prisma.FormUpsertWithWhereUniqueWithoutAccountInput[]
+  createMany?: Prisma.FormCreateManyAccountInputEnvelope
+  set?: Prisma.FormWhereUniqueInput | Prisma.FormWhereUniqueInput[]
+  disconnect?: Prisma.FormWhereUniqueInput | Prisma.FormWhereUniqueInput[]
+  delete?: Prisma.FormWhereUniqueInput | Prisma.FormWhereUniqueInput[]
+  connect?: Prisma.FormWhereUniqueInput | Prisma.FormWhereUniqueInput[]
+  update?: Prisma.FormUpdateWithWhereUniqueWithoutAccountInput | Prisma.FormUpdateWithWhereUniqueWithoutAccountInput[]
+  updateMany?: Prisma.FormUpdateManyWithWhereWithoutAccountInput | Prisma.FormUpdateManyWithWhereWithoutAccountInput[]
+  deleteMany?: Prisma.FormScalarWhereInput | Prisma.FormScalarWhereInput[]
 }
 
 export type FormCreateNestedManyWithoutUserInput = {
@@ -450,6 +516,70 @@ export type FormUpdateOneRequiredWithoutResponsesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.FormUpdateToOneWithWhereWithoutResponsesInput, Prisma.FormUpdateWithoutResponsesInput>, Prisma.FormUncheckedUpdateWithoutResponsesInput>
 }
 
+export type FormCreateWithoutAccountInput = {
+  id?: string
+  formsId: string
+  title: string
+  description?: string | null
+  slug: string
+  createdAt?: Date | string
+  fields?: Prisma.FormFieldCreateNestedManyWithoutFormInput
+  responses?: Prisma.ResponseCreateNestedManyWithoutFormInput
+  user: Prisma.UserCreateNestedOneWithoutFormsInput
+}
+
+export type FormUncheckedCreateWithoutAccountInput = {
+  id?: string
+  formsId: string
+  userId: string
+  title: string
+  description?: string | null
+  slug: string
+  createdAt?: Date | string
+  fields?: Prisma.FormFieldUncheckedCreateNestedManyWithoutFormInput
+  responses?: Prisma.ResponseUncheckedCreateNestedManyWithoutFormInput
+}
+
+export type FormCreateOrConnectWithoutAccountInput = {
+  where: Prisma.FormWhereUniqueInput
+  create: Prisma.XOR<Prisma.FormCreateWithoutAccountInput, Prisma.FormUncheckedCreateWithoutAccountInput>
+}
+
+export type FormCreateManyAccountInputEnvelope = {
+  data: Prisma.FormCreateManyAccountInput | Prisma.FormCreateManyAccountInput[]
+  skipDuplicates?: boolean
+}
+
+export type FormUpsertWithWhereUniqueWithoutAccountInput = {
+  where: Prisma.FormWhereUniqueInput
+  update: Prisma.XOR<Prisma.FormUpdateWithoutAccountInput, Prisma.FormUncheckedUpdateWithoutAccountInput>
+  create: Prisma.XOR<Prisma.FormCreateWithoutAccountInput, Prisma.FormUncheckedCreateWithoutAccountInput>
+}
+
+export type FormUpdateWithWhereUniqueWithoutAccountInput = {
+  where: Prisma.FormWhereUniqueInput
+  data: Prisma.XOR<Prisma.FormUpdateWithoutAccountInput, Prisma.FormUncheckedUpdateWithoutAccountInput>
+}
+
+export type FormUpdateManyWithWhereWithoutAccountInput = {
+  where: Prisma.FormScalarWhereInput
+  data: Prisma.XOR<Prisma.FormUpdateManyMutationInput, Prisma.FormUncheckedUpdateManyWithoutAccountInput>
+}
+
+export type FormScalarWhereInput = {
+  AND?: Prisma.FormScalarWhereInput | Prisma.FormScalarWhereInput[]
+  OR?: Prisma.FormScalarWhereInput[]
+  NOT?: Prisma.FormScalarWhereInput | Prisma.FormScalarWhereInput[]
+  id?: Prisma.StringFilter<"Form"> | string
+  formsId?: Prisma.StringFilter<"Form"> | string
+  userId?: Prisma.StringFilter<"Form"> | string
+  title?: Prisma.StringFilter<"Form"> | string
+  description?: Prisma.StringNullableFilter<"Form"> | string | null
+  slug?: Prisma.StringFilter<"Form"> | string
+  createdAt?: Prisma.DateTimeFilter<"Form"> | Date | string
+  accountId?: Prisma.StringNullableFilter<"Form"> | string | null
+}
+
 export type FormCreateWithoutUserInput = {
   id?: string
   formsId: string
@@ -459,6 +589,7 @@ export type FormCreateWithoutUserInput = {
   createdAt?: Date | string
   fields?: Prisma.FormFieldCreateNestedManyWithoutFormInput
   responses?: Prisma.ResponseCreateNestedManyWithoutFormInput
+  account?: Prisma.AccountCreateNestedOneWithoutFormsInput
 }
 
 export type FormUncheckedCreateWithoutUserInput = {
@@ -468,6 +599,7 @@ export type FormUncheckedCreateWithoutUserInput = {
   description?: string | null
   slug: string
   createdAt?: Date | string
+  accountId?: string | null
   fields?: Prisma.FormFieldUncheckedCreateNestedManyWithoutFormInput
   responses?: Prisma.ResponseUncheckedCreateNestedManyWithoutFormInput
 }
@@ -498,19 +630,6 @@ export type FormUpdateManyWithWhereWithoutUserInput = {
   data: Prisma.XOR<Prisma.FormUpdateManyMutationInput, Prisma.FormUncheckedUpdateManyWithoutUserInput>
 }
 
-export type FormScalarWhereInput = {
-  AND?: Prisma.FormScalarWhereInput | Prisma.FormScalarWhereInput[]
-  OR?: Prisma.FormScalarWhereInput[]
-  NOT?: Prisma.FormScalarWhereInput | Prisma.FormScalarWhereInput[]
-  id?: Prisma.StringFilter<"Form"> | string
-  formsId?: Prisma.StringFilter<"Form"> | string
-  userId?: Prisma.StringFilter<"Form"> | string
-  title?: Prisma.StringFilter<"Form"> | string
-  description?: Prisma.StringNullableFilter<"Form"> | string | null
-  slug?: Prisma.StringFilter<"Form"> | string
-  createdAt?: Prisma.DateTimeFilter<"Form"> | Date | string
-}
-
 export type FormCreateWithoutFieldsInput = {
   id?: string
   formsId: string
@@ -520,6 +639,7 @@ export type FormCreateWithoutFieldsInput = {
   createdAt?: Date | string
   responses?: Prisma.ResponseCreateNestedManyWithoutFormInput
   user: Prisma.UserCreateNestedOneWithoutFormsInput
+  account?: Prisma.AccountCreateNestedOneWithoutFormsInput
 }
 
 export type FormUncheckedCreateWithoutFieldsInput = {
@@ -530,6 +650,7 @@ export type FormUncheckedCreateWithoutFieldsInput = {
   description?: string | null
   slug: string
   createdAt?: Date | string
+  accountId?: string | null
   responses?: Prisma.ResponseUncheckedCreateNestedManyWithoutFormInput
 }
 
@@ -558,6 +679,7 @@ export type FormUpdateWithoutFieldsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   responses?: Prisma.ResponseUpdateManyWithoutFormNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutFormsNestedInput
+  account?: Prisma.AccountUpdateOneWithoutFormsNestedInput
 }
 
 export type FormUncheckedUpdateWithoutFieldsInput = {
@@ -568,6 +690,7 @@ export type FormUncheckedUpdateWithoutFieldsInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   responses?: Prisma.ResponseUncheckedUpdateManyWithoutFormNestedInput
 }
 
@@ -580,6 +703,7 @@ export type FormCreateWithoutResponsesInput = {
   createdAt?: Date | string
   fields?: Prisma.FormFieldCreateNestedManyWithoutFormInput
   user: Prisma.UserCreateNestedOneWithoutFormsInput
+  account?: Prisma.AccountCreateNestedOneWithoutFormsInput
 }
 
 export type FormUncheckedCreateWithoutResponsesInput = {
@@ -590,6 +714,7 @@ export type FormUncheckedCreateWithoutResponsesInput = {
   description?: string | null
   slug: string
   createdAt?: Date | string
+  accountId?: string | null
   fields?: Prisma.FormFieldUncheckedCreateNestedManyWithoutFormInput
 }
 
@@ -618,6 +743,7 @@ export type FormUpdateWithoutResponsesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fields?: Prisma.FormFieldUpdateManyWithoutFormNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutFormsNestedInput
+  account?: Prisma.AccountUpdateOneWithoutFormsNestedInput
 }
 
 export type FormUncheckedUpdateWithoutResponsesInput = {
@@ -628,7 +754,52 @@ export type FormUncheckedUpdateWithoutResponsesInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fields?: Prisma.FormFieldUncheckedUpdateManyWithoutFormNestedInput
+}
+
+export type FormCreateManyAccountInput = {
+  id?: string
+  formsId: string
+  userId: string
+  title: string
+  description?: string | null
+  slug: string
+  createdAt?: Date | string
+}
+
+export type FormUpdateWithoutAccountInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  formsId?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fields?: Prisma.FormFieldUpdateManyWithoutFormNestedInput
+  responses?: Prisma.ResponseUpdateManyWithoutFormNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutFormsNestedInput
+}
+
+export type FormUncheckedUpdateWithoutAccountInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  formsId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  fields?: Prisma.FormFieldUncheckedUpdateManyWithoutFormNestedInput
+  responses?: Prisma.ResponseUncheckedUpdateManyWithoutFormNestedInput
+}
+
+export type FormUncheckedUpdateManyWithoutAccountInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  formsId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type FormCreateManyUserInput = {
@@ -638,6 +809,7 @@ export type FormCreateManyUserInput = {
   description?: string | null
   slug: string
   createdAt?: Date | string
+  accountId?: string | null
 }
 
 export type FormUpdateWithoutUserInput = {
@@ -649,6 +821,7 @@ export type FormUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fields?: Prisma.FormFieldUpdateManyWithoutFormNestedInput
   responses?: Prisma.ResponseUpdateManyWithoutFormNestedInput
+  account?: Prisma.AccountUpdateOneWithoutFormsNestedInput
 }
 
 export type FormUncheckedUpdateWithoutUserInput = {
@@ -658,6 +831,7 @@ export type FormUncheckedUpdateWithoutUserInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   fields?: Prisma.FormFieldUncheckedUpdateManyWithoutFormNestedInput
   responses?: Prisma.ResponseUncheckedUpdateManyWithoutFormNestedInput
 }
@@ -669,6 +843,7 @@ export type FormUncheckedUpdateManyWithoutUserInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  accountId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -719,9 +894,11 @@ export type FormSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   description?: boolean
   slug?: boolean
   createdAt?: boolean
+  accountId?: boolean
   fields?: boolean | Prisma.Form$fieldsArgs<ExtArgs>
   responses?: boolean | Prisma.Form$responsesArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  account?: boolean | Prisma.Form$accountArgs<ExtArgs>
   _count?: boolean | Prisma.FormCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["form"]>
 
@@ -733,7 +910,9 @@ export type FormSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   description?: boolean
   slug?: boolean
   createdAt?: boolean
+  accountId?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  account?: boolean | Prisma.Form$accountArgs<ExtArgs>
 }, ExtArgs["result"]["form"]>
 
 export type FormSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -744,7 +923,9 @@ export type FormSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   description?: boolean
   slug?: boolean
   createdAt?: boolean
+  accountId?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  account?: boolean | Prisma.Form$accountArgs<ExtArgs>
 }, ExtArgs["result"]["form"]>
 
 export type FormSelectScalar = {
@@ -755,20 +936,24 @@ export type FormSelectScalar = {
   description?: boolean
   slug?: boolean
   createdAt?: boolean
+  accountId?: boolean
 }
 
-export type FormOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "formsId" | "userId" | "title" | "description" | "slug" | "createdAt", ExtArgs["result"]["form"]>
+export type FormOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "formsId" | "userId" | "title" | "description" | "slug" | "createdAt" | "accountId", ExtArgs["result"]["form"]>
 export type FormInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   fields?: boolean | Prisma.Form$fieldsArgs<ExtArgs>
   responses?: boolean | Prisma.Form$responsesArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  account?: boolean | Prisma.Form$accountArgs<ExtArgs>
   _count?: boolean | Prisma.FormCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type FormIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  account?: boolean | Prisma.Form$accountArgs<ExtArgs>
 }
 export type FormIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  account?: boolean | Prisma.Form$accountArgs<ExtArgs>
 }
 
 export type $FormPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -777,6 +962,7 @@ export type $FormPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     fields: Prisma.$FormFieldPayload<ExtArgs>[]
     responses: Prisma.$ResponsePayload<ExtArgs>[]
     user: Prisma.$UserPayload<ExtArgs>
+    account: Prisma.$AccountPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -786,6 +972,7 @@ export type $FormPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     description: string | null
     slug: string
     createdAt: Date
+    accountId: string | null
   }, ExtArgs["result"]["form"]>
   composites: {}
 }
@@ -1183,6 +1370,7 @@ export interface Prisma__FormClient<T, Null = never, ExtArgs extends runtime.Typ
   fields<T extends Prisma.Form$fieldsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Form$fieldsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FormFieldPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   responses<T extends Prisma.Form$responsesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Form$responsesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ResponsePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  account<T extends Prisma.Form$accountArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Form$accountArgs<ExtArgs>>): Prisma.Prisma__AccountClient<runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1219,6 +1407,7 @@ export interface FormFieldRefs {
   readonly description: Prisma.FieldRef<"Form", 'String'>
   readonly slug: Prisma.FieldRef<"Form", 'String'>
   readonly createdAt: Prisma.FieldRef<"Form", 'DateTime'>
+  readonly accountId: Prisma.FieldRef<"Form", 'String'>
 }
     
 
@@ -1660,6 +1849,25 @@ export type Form$responsesArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   distinct?: Prisma.ResponseScalarFieldEnum | Prisma.ResponseScalarFieldEnum[]
+}
+
+/**
+ * Form.account
+ */
+export type Form$accountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Account
+   */
+  select?: Prisma.AccountSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Account
+   */
+  omit?: Prisma.AccountOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AccountInclude<ExtArgs> | null
+  where?: Prisma.AccountWhereInput
 }
 
 /**

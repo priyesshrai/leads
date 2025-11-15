@@ -17,8 +17,8 @@ export const ADMIN_TABS = [
         icon: ClipboardPenIcon,
     },
     {
-        name: "Add Admin",
-        page: "/admin/create-admin",
+        name: "Add Account",
+        page: "/admin/create-account",
         icon: ShieldUserIcon,
     },
 ] as const;

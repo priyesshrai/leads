@@ -14,6 +14,19 @@ enum Role {
   ADMIN
 }
 
+model Account {
+  id           String  @id @default(uuid())
+  businessName String?
+  phone        String?
+  location     String?
+  email        String?
+
+  users User[]
+  forms Form[]
+
+  createdAt DateTime @default(now())
+}
+
 model User {
   id                  String        @id @default(uuid())
   name                String
@@ -23,6 +36,8 @@ model User {
   createdById         String?
   createdBy           User?         @relation("CreatedAdmins", fields: [createdById], references: [id])
   createdAdmins       User[]        @relation("CreatedAdmins")
+  accountId           String
+  account             Account       @relation(fields: [accountId], references: [id])
   managedUsers        ManagedUser[]
   forms               Form[]
   resetToken          String?
@@ -53,7 +68,9 @@ model Form {
   responses   Response[]
   createdAt   DateTime    @default(now())
 
-  user User @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+  account   Account? @relation(fields: [accountId], references: [id])
+  accountId String?
 }
 
 model FormField {
