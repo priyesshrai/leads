@@ -1,4 +1,4 @@
-import { HomeIcon, FileCode2Icon, ShieldUserIcon, ClipboardPenIcon, LucideIcon } from "lucide-react";
+import { HomeIcon, FileCode2Icon, ShieldUserIcon, ClipboardPenIcon, LucideIcon, UserCheck, UserRoundPlus } from "lucide-react";
 
 type SidebarItem = {
     name: string;
@@ -9,23 +9,18 @@ type SidebarItem = {
 export const SYSTEM_ADMIN: SidebarItem[] = [
     {
         name: "Dashboard",
-        page: "/admin/dashboard",
+        page: "/system_admin/dashboard",
         icon: HomeIcon,
     },
     {
-        name: "Forms",
-        page: "/admin/forms",
-        icon: FileCode2Icon,
-    },
-    {
-        name: "Create Form",
-        page: "/admin/forms/create",
-        icon: ClipboardPenIcon,
+        name: "Accounts",
+        page: "/system_admin/accounts",
+        icon: UserCheck,
     },
     {
         name: "Add Account",
-        page: "/admin/create-account",
-        icon: ShieldUserIcon,
+        page: "/system_admin/create-account",
+        icon: UserRoundPlus,
     },
 ] as const;
 
