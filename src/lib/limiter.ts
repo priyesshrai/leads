@@ -8,14 +8,14 @@ export function isRateLimited(ip: string): boolean {
     const record = rateLimitMap.get(ip)
 
     if (!record) {
-        rateLimitMap.set(ip, { count: 1, lastAttempt: now })
+        rateLimitMap.set(ip, { count: 10, lastAttempt: now })
         return false
     }
 
     const diff = now - record.lastAttempt
 
     if (diff > WINDOW) {
-        rateLimitMap.set(ip, { count: 1, lastAttempt: now })
+        rateLimitMap.set(ip, { count: 10, lastAttempt: now })
         return false
     }
 

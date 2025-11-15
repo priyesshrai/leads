@@ -62,7 +62,7 @@ export async function GET(req: NextRequest) {
         console.error("GET /users error:", error.message);
 
         return NextResponse.json(
-            { error: "Internal server error" },
+            { error: error.message },
             { status: 500 }
         );
     }
