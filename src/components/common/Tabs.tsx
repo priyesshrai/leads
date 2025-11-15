@@ -1,15 +1,16 @@
 "use client";
-import { ADMIN_TABS } from "@/src/constants/adminTabs";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/src/lib/utils";
+import { ADMIN_TABS, SYSTEM_ADMIN } from "@/src/constants/adminTabs";
+
 
 export default function Tabs() {
     const pathname = usePathname();
 
     return (
         <div className="flex flex-col gap-1 pl-5 pt-5 overflow-y-auto flex-1">
-            {ADMIN_TABS.map((tab) => {
+            {((pathname.startsWith("/admin") ? ADMIN_TABS : SYSTEM_ADMIN)).map((tab) => {
                 const isActive = pathname.startsWith(tab.page);
                 const Icon = tab.icon;
                 return (

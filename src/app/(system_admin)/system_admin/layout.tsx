@@ -1,10 +1,9 @@
 import SideBar from "@/src/components/common/SideBar";
-import { ADMIN_TABS } from "@/src/constants/adminTabs";
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default function SystemAdminLayout({ children }: { children: React.ReactNode }) {
     return (
         <main className="flex min-h-screen">
-            <SideBar tabsItems={ADMIN_TABS} />
+            <SideBar />
             <section className="flex-1 ml-[16%] p-6">
                 {children}
             </section>

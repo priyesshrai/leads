@@ -1,47 +1,82 @@
-import { NextResponse, NextRequest } from "next/server"
-import { verifyToken } from "./lib/auth";
+import { NextResponse, NextRequest } from "next/server";
+import jwt from "jsonwebtoken";
 
-const protectedRoutes = ["/dashboard", "/admin", "/profile"];
+const JWT_SECRET = process.env.JWT_SECRET!;
 
-const publicRoutes = ["/login", "/reset-password", "/forget-password"]
+const PUBLIC_ROUTES = [
+    "/login",
+    "/forget-password",
+    "/reset-password",
+];
 
-export async function proxy(req: NextRequest) {
+const ROLE_ROUTES = {
+    ADMIN: ["/admin"],
+    SUPERADMIN: ["/system_admin", "/superadmin"],
+};
+
+function safeVerifyToken(token: string | null) {
+    if (!token) return null;
+    try {
+        return jwt.verify(token, JWT_SECRET) as {
+            id: string;
+            email: string;
+            role: "ADMIN" | "SUPERADMIN";
+        };
+    } catch {
+        return null;
+    }
+}
+
+export function proxy(req: NextRequest) {
     const { pathname } = req.nextUrl;
     const token = req.cookies.get("token")?.value || null;
+    const decoded = safeVerifyToken(token);
 
-    if (!token) {
-        if (protectedRoutes.some(route => pathname.startsWith(route))) {
-            return NextResponse.redirect(new URL("/login", req.url));
+    const isPublicRoute = PUBLIC_ROUTES.some((r) => pathname.startsWith(r));
+
+    if (!decoded) {
+        if (!isPublicRoute) {
+            const res = NextResponse.redirect(new URL("/login", req.url));
+            res.cookies.delete("token");
+            return res;
         }
         return NextResponse.next();
     }
 
-    const decoded = verifyToken(token);
-
-    if (!decoded) {
-        const response = NextResponse.redirect(new URL("/login", req.url));
-        response.cookies.delete("token");
-        return response;
-    }
-
-    if (publicRoutes.some(route => pathname.startsWith(route))) {
-        if (decoded.role === "ADMIN" || decoded.role === "SUPERADMIN") {
+    if (isPublicRoute) {
+        if (decoded.role === "ADMIN") {
             return NextResponse.redirect(new URL("/admin/dashboard", req.url));
+        }
+        if (decoded.role === "SUPERADMIN") {
+            return NextResponse.redirect(new URL("/system_admin/dashboard", req.url));
         }
         return NextResponse.redirect(new URL("/login", req.url));
     }
+
+    for (const role in ROLE_ROUTES) {
+        const restrictedPaths = ROLE_ROUTES[role as keyof typeof ROLE_ROUTES];
+
+        const isRestricted = restrictedPaths.some((r) =>
+            pathname.startsWith(r)
+        );
+
+        if (isRestricted && decoded.role !== role) {
+            return NextResponse.redirect(new URL("/unauthorized", req.url));
+        }
+    }
+
     return NextResponse.next();
 }
 
 export const config = {
     matcher: [
         "/login",
-        "/register",
         "/forget-password",
         "/reset-password",
         "/admin/:path*",
-        "/profile/:path*",
+        "/system_admin/:path*",
         "/superadmin/:path*",
-        "/((?!_next/static|_next/image|favicon.ico).*)",
+        "/profile/:path*",
+        "/((?!_next|.*\\..*).*)",
     ],
-}
+};
