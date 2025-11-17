@@ -20,18 +20,10 @@ export async function GET(req: NextRequest) {
         const limit = Math.min(Math.max(Number(searchParams.get("limit")) || 10, 1), 50);
         const skip = (page - 1) * limit;
 
-        const users = await prisma.user.findMany({
+        const users = await prisma.account.findMany({
             skip,
             take: limit,
             orderBy: { createdAt: "desc" },
-            select: {
-                id: true,
-                name: true,
-                email: true,
-                role: true,
-                accountId: true,
-                createdAt: true,
-            },
         });
 
         const totalUsers = await prisma.user.count();
@@ -42,7 +34,6 @@ export async function GET(req: NextRequest) {
                 { status: 200 }
             );
         }
-
         const pageCount = Math.ceil(totalUsers / limit);
         const response = {
             users,

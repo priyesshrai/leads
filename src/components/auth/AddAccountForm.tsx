@@ -89,7 +89,7 @@ export default function AddAccountForm() {
                 value={formValue.name}
                 type="text"
                 name="name"
-                label="Full Name"
+                label="Contact Person Name"
                 placeholder="Enter full name"
                 leftIcon={<User size={18} />}
                 onChange={handleChange}

@@ -1,7 +1,7 @@
 import AddAccountForm from '@/src/components/auth/AddAccountForm'
 import React from 'react'
 
-export default function page() {
+export default function AccountCreatePage() {
   return (
     <section className='relative w-full p-5'>
       <div className='w-full relative bg-white p-5 rounded-2xl shadow'>

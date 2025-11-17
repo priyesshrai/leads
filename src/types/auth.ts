@@ -41,7 +41,6 @@ export const createAccountUserSchema = z.object({
   phone: z
     .string()
     .trim()
-    .min(10, "Phone number must be at least 10 digits")
     .max(15, "Phone number too long")
     .optional(),
 
