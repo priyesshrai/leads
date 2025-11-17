@@ -82,7 +82,7 @@ export default function LoginForm() {
                 Forget password?
             </Link>
             <button
-                disabled={disableButton || isPending}
+                disabled={disableButton || isPending || isSuccess}
                 role='button'
                 className={`w-full bg-blue-600 py-2.5 text-white mt-3 rounded font-medium text-lg ${disableButton ? 'cursor-not-allowed' : 'cursor-pointer'} `}
             >

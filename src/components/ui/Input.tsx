@@ -4,12 +4,13 @@ export interface InputProps
     extends React.InputHTMLAttributes<HTMLInputElement> {
     label?: string;
     error?: boolean;
+    helperText?: string | string[];
     leftIcon?: React.ReactNode;
     rightIcon?: React.ReactNode;
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-    ({ label, error, leftIcon, rightIcon, className = "", ...props }, ref) => {
+    ({ label, error,helperText, leftIcon, rightIcon, className = "", ...props }, ref) => {
         return (
             <div className="w-full flex flex-col gap-2">
                 {label && (
@@ -43,6 +44,13 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
                         {...props}
                     />
                 </div>
+                {helperText && (
+                    <p className="text-red-500 text-sm">
+                        {Array.isArray(helperText)
+                            ? helperText.join(", ")
+                            : helperText}
+                    </p>
+                )}
 
             </div>
         );

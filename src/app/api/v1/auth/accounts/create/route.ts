@@ -102,7 +102,6 @@ export async function POST(req: NextRequest) {
             {
                 success: true,
                 message: "Account & User created. Credentials sent to email.",
-                account: newAccount,
             },
             { status: 201 }
         );
