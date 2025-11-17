@@ -76,6 +76,7 @@ export default function LoginForm() {
                     )
                 }
                 onChange={handleChange}
+                error={isError}
             />
             <Link href='/forget-password' className='ml-auto text-blue-400 '>
                 Forget password?

@@ -1,21 +1,21 @@
 const rateLimitMap = new Map<string, { count: number; lastAttempt: number }>()
 
 const WINDOW = 60_000
-const MAX_ATTEMPTS = 5
+const MAX_ATTEMPTS = 10
 
 export function isRateLimited(ip: string): boolean {
     const now = Date.now()
     const record = rateLimitMap.get(ip)
 
     if (!record) {
-        rateLimitMap.set(ip, { count: 10, lastAttempt: now })
+        rateLimitMap.set(ip, { count: 1, lastAttempt: now })
         return false
     }
 
     const diff = now - record.lastAttempt
 
     if (diff > WINDOW) {
-        rateLimitMap.set(ip, { count: 10, lastAttempt: now })
+        rateLimitMap.set(ip, { count: 1, lastAttempt: now })
         return false
     }
 

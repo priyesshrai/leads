@@ -6,12 +6,16 @@ const JWT_SECRET = process.env.JWT_SECRET!;
 const PUBLIC_ROUTES = [
     "/login",
     "/forget-password",
-    "/reset-password",
+    "/reset-password"
 ];
 
 const ROLE_ROUTES = {
     ADMIN: ["/admin"],
     SUPERADMIN: ["/system_admin", "/superadmin"],
+};
+const ROLE_DASHBOARD: Record<"ADMIN" | "SUPERADMIN", string> = {
+    ADMIN: "/admin/dashboard",
+    SUPERADMIN: "/system_admin/dashboard",
 };
 
 function safeVerifyToken(token: string | null) {
@@ -28,40 +32,38 @@ function safeVerifyToken(token: string | null) {
 }
 
 export function proxy(req: NextRequest) {
-    const { pathname } = req.nextUrl;
+    const pathname = req.nextUrl.pathname;
     const token = req.cookies.get("token")?.value || null;
     const decoded = safeVerifyToken(token);
 
-    const isPublicRoute = PUBLIC_ROUTES.some((r) => pathname.startsWith(r));
+    const isPublic = PUBLIC_ROUTES.includes(pathname);
 
     if (!decoded) {
-        if (!isPublicRoute) {
-            const res = NextResponse.redirect(new URL("/login", req.url));
-            res.cookies.delete("token");
-            return res;
+        if (!isPublic) {
+            return NextResponse.redirect(new URL("/login", req.url));
         }
         return NextResponse.next();
     }
 
-    if (isPublicRoute) {
+    if (isPublic) {
         if (decoded.role === "ADMIN") {
             return NextResponse.redirect(new URL("/admin/dashboard", req.url));
         }
         if (decoded.role === "SUPERADMIN") {
             return NextResponse.redirect(new URL("/system_admin/dashboard", req.url));
         }
-        return NextResponse.redirect(new URL("/login", req.url));
     }
 
     for (const role in ROLE_ROUTES) {
-        const restrictedPaths = ROLE_ROUTES[role as keyof typeof ROLE_ROUTES];
+        const allowedPaths = ROLE_ROUTES[role as keyof typeof ROLE_ROUTES];
 
-        const isRestricted = restrictedPaths.some((r) =>
-            pathname.startsWith(r)
+        const isRestrictedPage = allowedPaths.some((route) =>
+            pathname.startsWith(route)
         );
 
-        if (isRestricted && decoded.role !== role) {
-            return NextResponse.redirect(new URL("/unauthorized", req.url));
+        if (isRestrictedPage && decoded.role !== role) {
+            const userDashboard = ROLE_DASHBOARD[decoded.role];
+            return NextResponse.redirect(new URL(userDashboard, req.url));
         }
     }
 
@@ -70,13 +72,12 @@ export function proxy(req: NextRequest) {
 
 export const config = {
     matcher: [
-        "/login",
-        "/forget-password",
-        "/reset-password",
         "/admin/:path*",
         "/system_admin/:path*",
         "/superadmin/:path*",
         "/profile/:path*",
-        "/((?!_next|.*\\..*).*)",
+        "/login",
+        "/forget-password",
+        "/reset-password",
     ],
 };
