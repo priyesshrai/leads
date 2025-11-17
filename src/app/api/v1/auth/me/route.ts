@@ -32,6 +32,7 @@ export async function GET(req: NextRequest) {
         const initials = generateNameInitials(dbUser.name);
         const responsePayload = {
             id: dbUser.id,
+            name: dbUser.name,
             email: dbUser.email,
             accountId: dbUser.accountId,
             account: dbUser.account,

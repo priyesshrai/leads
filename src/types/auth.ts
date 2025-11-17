@@ -79,3 +79,22 @@ export const forgetPasswordEMail = z.object({
     .min(5, "Email must be at least 5 characters")
     .max(100, "Email too long"),
 })
+
+export interface Account {
+  id: string;
+  businessName: string | null;
+  phone: string | null;
+  location: string | null;
+  email: string;
+  createdAt: Date;
+}
+
+export interface AuthUser {
+  id: string;
+  name: string;
+  email: string;
+  accountId: string;
+  account: Account;
+  initials: string;
+}
+
