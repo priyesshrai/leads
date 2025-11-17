@@ -46,7 +46,7 @@ export default function ProfileDropdown({ user }: { user: AuthUser | null}) {
 
                 <DropdownMenuItem
                     onClick={async () => {
-                        await fetch("/api/auth/logout", { method: "POST" });
+                        await fetch("/api/v1/auth/logout", { method: "POST" });
                         window.location.href = "/login";
                     }}
                     className="text-red-600 cursor-pointer"
