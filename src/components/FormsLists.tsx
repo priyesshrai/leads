@@ -261,7 +261,7 @@ function ViewFormModal() {
                 </button>
 
                 {isLoading && (
-                    <p className="text-center text-zinc-600 py-8">Loading form...</p>
+                    <Spinner />
                 )}
 
                 {isError && (
