@@ -1,15 +1,14 @@
 import { NextResponse } from "next/server"
-import { PrismaClient } from "@/src/app/generated/prisma/client"
 import { createFormSchema } from "@/src/types/form"
-import { VerifyAdmin } from "@/src/lib/auth"
 import slugify from "slugify"
+import { isRateLimited } from "@/src/lib/limiter"
+import { verifyRole } from "@/src/lib/verifyRole"
+import prisma from "@/src/lib/prisma"
 
-
-const prisma = new PrismaClient()
 
 export async function GET(req: Request) {
     try {
-        const user = await VerifyAdmin()
+        const user = await verifyRole("ADMIN")
         const forms = await prisma.form.findMany({
             where: { userId: user.id },
             include: { fields: true },
@@ -24,7 +23,15 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
     try {
-        const user = await VerifyAdmin()
+        const ip = req.headers.get("x-forwarded-for") || "unknown";
+        if (isRateLimited(ip)) {
+            return NextResponse.json(
+                { error: "Too many requests. Try again later." },
+                { status: 429 }
+            );
+        }
+
+        const user = await verifyRole(["SUPERADMIN", "ADMIN"]);
 
         const contentLength = Number(req.headers.get("content-length") || 0)
         if (contentLength > 50_000) {
@@ -43,6 +50,7 @@ export async function POST(req: Request) {
 
         const cleanTitle = title.trim()
         const cleanDescription = description?.trim() || ""
+        
         const slugBase = slugify(cleanTitle, { lower: true, strict: true })
         const slug = `${slugBase}-${Date.now()}`
 
@@ -56,8 +64,12 @@ export async function POST(req: Request) {
                 { status: 400 }
             )
         }
-        const formOwner = await prisma.user.findFirst({
-            where: { id: user.id }
+        const formOwner = await prisma.user.findUnique({
+            where: { id: user.id },
+            select:{
+                name:true,
+                accountId:true
+            }
         })
         const formCount = await prisma.form.count({
             where: { userId: user.id },
@@ -76,6 +88,7 @@ export async function POST(req: Request) {
                     formsId: uniqueId,
                     slug,
                     userId: user.id,
+                    accountId: formOwner?.accountId,
                     fields: {
                         create: fields?.map((f, idx) => ({
                             label: f.label.trim(),
@@ -93,8 +106,8 @@ export async function POST(req: Request) {
         })
 
         return NextResponse.json({ success: true, form: result }, { status: 201 })
-    } catch (err) {
-        console.error(err)
-        return NextResponse.json({ error: "Failed to create form" }, { status: 500 })
+    } catch (err: any) {
+        console.error(err.message)
+        return NextResponse.json({ error: err.message || "Failed to create form" }, { status: 500 })
     }
 }
