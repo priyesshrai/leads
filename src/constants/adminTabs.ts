@@ -37,7 +37,7 @@ export const ADMIN_TABS: SidebarItem[] = [
     },
     {
         name: "Create Form",
-        page: "/admin/forms/create",
+        page: "/admin/create_forms",
         icon: ClipboardPenIcon,
     },
     {

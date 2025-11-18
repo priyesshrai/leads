@@ -10,7 +10,7 @@ export default function Breadcrumb() {
 
   const toTitle = (str: string) =>
     str
-      .replace(/-/g, " ")
+      .replace(/[-_]/g, " ")
       .replace(/\b\w/g, (char) => char.toUpperCase());
 
   const formatted = segments.map((seg) => toTitle(seg));

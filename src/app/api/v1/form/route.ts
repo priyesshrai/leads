@@ -8,7 +8,7 @@ import prisma from "@/src/lib/prisma"
 
 export async function GET(req: Request) {
     try {
-        const user = await verifyRole("ADMIN")
+        const user = await verifyRole(["ADMIN","SUPERADMIN"])
         const forms = await prisma.form.findMany({
             where: { userId: user.id },
             include: { fields: true },
@@ -39,6 +39,7 @@ export async function POST(req: Request) {
         }
 
         const body = await req.json()
+        
         const parsed = createFormSchema.safeParse(body)
         if (!parsed.success) {
             return NextResponse.json(
@@ -50,7 +51,7 @@ export async function POST(req: Request) {
 
         const cleanTitle = title.trim()
         const cleanDescription = description?.trim() || ""
-        
+
         const slugBase = slugify(cleanTitle, { lower: true, strict: true })
         const slug = `${slugBase}-${Date.now()}`
 
