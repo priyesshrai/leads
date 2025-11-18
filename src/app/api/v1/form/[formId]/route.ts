@@ -1,14 +1,21 @@
-import { PrismaClient } from "@/src/app/generated/prisma/client";
-import { VerifyAdmin } from "@/src/lib/auth";
+import { isRateLimited } from "@/src/lib/limiter";
+import prisma from "@/src/lib/prisma";
+import { verifyRole } from "@/src/lib/verifyRole";
 import { updateFormSchema } from "@/src/types/form";
 import { NextRequest, NextResponse } from "next/server";
 import slugify from "slugify";
 
-const prisma = new PrismaClient();
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ formId: string }> }) {
     try {
-        const user = await VerifyAdmin()
+        const ip = req.headers.get("x-forwarded-for") || "unknown";
+        if (isRateLimited(ip)) {
+            return NextResponse.json(
+                { error: "Too many requests. Try again later." },
+                { status: 429 }
+            );
+        }
+        const user = await verifyRole(["ADMIN", "SUPERADMIN"])
         const { formId } = await params
 
         if (!formId || formId.trim() === "") {
@@ -30,7 +37,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ formId: string }> }) {
     try {
-        const user = await VerifyAdmin()
+        const user = await verifyRole(["ADMIN","SUPERADMIN"])
         const { formId } = await params
 
         if (!formId || formId.trim() === "") {
@@ -55,7 +62,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ f
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ formId: string }> }) {
     try {
-        const user = await VerifyAdmin()
+        const user = await verifyRole(["ADMIN","SUPERADMIN"])
         const contentLength = Number(req.headers.get("content-length") || 0)
         if (contentLength > 50_000) {
             return NextResponse.json({ error: "Payload too large" }, { status: 413 })

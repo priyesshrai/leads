@@ -8,6 +8,14 @@ import prisma from "@/src/lib/prisma"
 
 export async function GET(req: Request) {
     try {
+        const ip = req.headers.get("x-forwarded-for") || "unknown";
+        if (isRateLimited(ip)) {
+            return NextResponse.json(
+                { error: "Too many requests. Try again later." },
+                { status: 429 }
+            );
+        }
+
         const user = await verifyRole(["ADMIN", "SUPERADMIN"])
         const { searchParams } = new URL(req.url);
         const page = Math.max(Number(searchParams.get("page")) || 1, 1);
