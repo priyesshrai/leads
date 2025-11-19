@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useMutation } from '@tanstack/react-query';
 import axios, { AxiosError } from 'axios';
 import { redirect } from 'next/navigation';
+import Spinner from '../ui/spinner';
 
 export default function LoginForm() {
     const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -37,9 +38,9 @@ export default function LoginForm() {
         },
         onSuccess: () => {
             setFormValue({ email: "", password: "" });
-            setTimeout(()=>{
+            setTimeout(() => {
                 redirect('/admin/dashboard')
-            },1500)
+            }, 1500)
         },
     });
     const { mutate, isPending, isError, error, isSuccess } = loginMutation;
@@ -84,9 +85,9 @@ export default function LoginForm() {
             <button
                 disabled={disableButton || isPending || isSuccess}
                 role='button'
-                className={`w-full bg-blue-600 py-2.5 text-white mt-3 rounded font-medium text-lg ${disableButton ? 'cursor-not-allowed' : 'cursor-pointer'} `}
+                className={`w-full flex items-center justify-center bg-blue-600 py-2.5 text-white mt-3 rounded font-medium text-lg ${disableButton ? 'cursor-not-allowed' : 'cursor-pointer'} `}
             >
-                {isPending ? "Loading..." : 'Login'}
+                {isPending ? <Spinner color='white' /> : 'Login'}
             </button>
             {isError && (
                 <p className="text-red-500 text-sm mt-1">
