@@ -94,7 +94,13 @@ export default function FormsList() {
                             {form.formsId.split("-")[0]}-{form.formsId.split("-")[1]}
                         </div>
 
-                        <h2 className="text-xl font-semibold text-zinc-800">{form.title}</h2>
+                        <h2
+                            className="text-xl font-semibold text-zinc-800 truncate max-w-[180px]"
+                            title={form.title}
+                        >
+                            {form.title}
+                        </h2>
+
 
                         <p className="text-sm text-zinc-600 line-clamp-2">
                             {form.description || "No description"}

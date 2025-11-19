@@ -1,13 +1,10 @@
 import { v2 as cloudinary } from "cloudinary";
-import fs from "fs";
-import { promisify } from "util";
 import { NextRequest, NextResponse } from "next/server";
 import { isRateLimited } from "@/src/lib/limiter";
 import prisma from "@/src/lib/prisma";
+import { verifyRole } from "@/src/lib/verifyRole";
 
 export const runtime = "nodejs";
-
-const unlinkAsync = promisify(fs.unlink);
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME!,
@@ -40,7 +37,7 @@ async function uploadToCloudinaryBuffer(buffer: Buffer, fieldId: string) {
     });
 }
 
-
+// Saving form data in DB(any one).
 export async function POST(req: NextRequest, { params }: { params: Promise<{ formId: string }> }) {
     const fileMap: Record<string, File[]> = {};
     try {
@@ -161,6 +158,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
     }
 }
 
+// Getting all the response for the single form provided according to form id(Only admin and superadmin).
 export async function GET(req: NextRequest, { params }: { params: Promise<{ formId: string }> }) {
     try {
         const ip = req.headers.get("x-forwarded-for") || "unknown";
@@ -171,6 +169,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
                 { status: 429 }
             );
         }
+
+        await verifyRole(["ADMIN","SUPERADMIN"])
         const { formId } = await params;
 
         const form = await prisma.form.findUnique({
