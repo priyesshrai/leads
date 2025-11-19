@@ -1,11 +1,9 @@
 'use client';
-
 import { X } from "lucide-react";
 import Spinner from "../ui/spinner";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { useMemo } from "react";
 
 interface Field {
     id: string;
@@ -31,7 +29,7 @@ export default function ViewForm() {
             return res.data.form;
         },
         enabled: hasFormId,
-        staleTime: 1000 * 60, // cache for 1 minute
+        staleTime: 1000 * 60 * 60,
     });
 
     const closeModal = () => {
