@@ -46,7 +46,7 @@ export const formFieldSchema = z
 
 export const updateFormFieldSchema = z
     .object({
-        id:z.string().uuid().optional(),
+        id: z.string().uuid().optional(),
         label: z
             .string({ error: "Label is required" })
             .trim()
@@ -109,8 +109,18 @@ export const createFormSchema = z.object({
         .optional(),
 })
 export const updateFormSchema = z.object({
-    title: z.string().min(3, "Title is required"),
-    description: z.string().optional(),
+    title: z
+        .string({ error: "Form title is required" })
+        .trim()
+        .min(3, "Title must be at least 3 characters long")
+        .max(100, "Title too long"),
+
+    description: z
+        .string()
+        .trim()
+        .max(500, "Description too long")
+        .optional(),
+
     fields: z.array(updateFormFieldSchema).optional(),
 })
 

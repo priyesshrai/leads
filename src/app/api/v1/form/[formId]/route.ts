@@ -132,6 +132,14 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ f
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ formId: string }> }) {
     try {
+        const ip = req.headers.get("x-forwarded-for") || "unknown";
+        if (isRateLimited(ip)) {
+            return NextResponse.json(
+                { error: "Too many requests. Try again later." },
+                { status: 429 }
+            );
+        }
+
         const user = await verifyRole(["ADMIN", "SUPERADMIN"])
         const contentLength = Number(req.headers.get("content-length") || 0)
         if (contentLength > 50_000) {
@@ -180,8 +188,52 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ fo
             const incomingIds = fields?.map((f: any) => f.id).filter(Boolean) || []
 
             const toDelete = existingIds.filter((id) => !incomingIds.includes(id))
+
             if (toDelete.length > 0) {
-                await tx.formField.deleteMany({ where: { id: { in: toDelete } } })
+
+                const answers = await tx.responseAnswer.findMany({
+                    where: { fieldId: { in: toDelete } }
+                });
+
+                const cloudinaryFiles: { resource_type: string; public_id: string }[] = [];
+
+                for (const ans of answers) {
+                    if (!ans.value) continue;
+
+                    let urls: string[] = [];
+
+                    if (ans.value.startsWith("[")) {
+                        try { urls = JSON.parse(ans.value); } catch { }
+                    } else if (ans.value.startsWith("http")) {
+                        urls = [ans.value];
+                    }
+
+                    for (const url of urls) {
+                        const info = extractCloudinaryInfo(url);
+                        if (info) cloudinaryFiles.push(info);
+                    }
+                }
+
+                for (const file of cloudinaryFiles) {
+                    try {
+                        await cloudinary.uploader.destroy(file.public_id, {
+                            resource_type: file.resource_type,
+                        });
+                    } catch (err) {
+                        console.error("Cloudinary delete error:", err);
+                    }
+                }
+
+                await tx.response.deleteMany({
+                    where: {
+                        formId: form.id,
+                        answers: { none: {} }
+                    }
+                });
+
+                await tx.formField.deleteMany({
+                    where: { id: { in: toDelete } }
+                });
             }
 
             for (const [index, f] of (fields || []).entries()) {
