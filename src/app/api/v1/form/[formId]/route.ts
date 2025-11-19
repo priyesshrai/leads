@@ -4,7 +4,15 @@ import { verifyRole } from "@/src/lib/verifyRole";
 import { updateFormSchema } from "@/src/types/form";
 import { NextRequest, NextResponse } from "next/server";
 import slugify from "slugify";
+import { v2 as cloudinary } from "cloudinary";
+import { extractCloudinaryInfo } from "@/src/lib/extractCloudinaryInfo";
 
+
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME!,
+    api_key: process.env.CLOUDINARY_API_KEY!,
+    api_secret: process.env.CLOUDINARY_API_SECRET!,
+});
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ formId: string }> }) {
     try {
@@ -56,11 +64,66 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ f
         })
         if (!form) return NextResponse.json({ error: "Form not found" }, { status: 404 })
 
+        const answers = await prisma.responseAnswer.findMany({
+            where: {
+                field: {
+                    formId: form.id
+                }
+            }
+        });
+
+        const cloudinaryFiles: { public_id: string; resource_type: string }[] = [];
+        for (const ans of answers) {
+            if (!ans.value) continue;
+
+            let values: string[] = [];
+            if (ans.value.startsWith("[")) {
+                try {
+                    values = JSON.parse(ans.value);
+                } catch {
+                    continue;
+                }
+            } else if (ans.value.startsWith("http")) {
+                values = [ans.value];
+            }
+
+            for (const url of values) {
+                const info = extractCloudinaryInfo(url);
+                if (info) {
+                    cloudinaryFiles.push(info);
+                }
+            }
+        }
+        for (const file of cloudinaryFiles) {
+            try {
+                await cloudinary.uploader.destroy(file.public_id, {
+                    resource_type: file.resource_type
+                });
+            } catch (err) {
+                console.error("Cloudinary delete error:", err);
+            }
+        }
+
         await prisma.$transaction([
-            prisma.formField.deleteMany({ where: { formId: form.id } }),
-            prisma.form.delete({ where: { id: form.id } }),
-        ])
-        return NextResponse.json({ success: true })
+            prisma.responseAnswer.deleteMany({
+                where: {
+                    response: {
+                        formId: form.id
+                    }
+                }
+            }),
+            prisma.response.deleteMany({
+                where: { formId: form.id }
+            }),
+            prisma.formField.deleteMany({
+                where: { formId: form.id }
+            }),
+            prisma.form.delete({
+                where: { id: form.id }
+            })
+        ]);
+
+        return NextResponse.json({ success: true });
     } catch (err) {
         console.error(err)
         return NextResponse.json({ error: "Error deleting form" }, { status: 500 })
