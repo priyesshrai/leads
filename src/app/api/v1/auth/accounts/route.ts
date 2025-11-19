@@ -3,6 +3,8 @@ import prisma from "@/src/lib/prisma";
 import { verifyRole } from "@/src/lib/verifyRole";
 import { NextRequest, NextResponse } from "next/server";
 
+
+// Get all the account (only superadmin).
 export async function GET(req: NextRequest) {
     try {
         const ip = req.headers.get("x-forwarded-for") || "unknown";

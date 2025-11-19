@@ -6,6 +6,7 @@ import FieldItem from "./FieldItem";
 import Spinner from "./ui/spinner";
 import { useMutation } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
+import toast, { Toaster } from 'react-hot-toast';
 
 interface FormField {
   label: string;
@@ -28,6 +29,7 @@ export default function AddNewForm() {
       </button>
 
       {openFormModal && <OpenForm onClose={setOpenFormModal} />}
+      <Toaster />
     </div>
   );
 }
@@ -82,10 +84,16 @@ function OpenForm({ onClose }: { onClose: Dispatch<React.SetStateAction<boolean>
       } else {
         showMessage("error", "Something went wrong. Try again.");
       }
+      toast.error('Something went wrong. Try again.', {
+        duration: 5000
+      });
     },
 
     onSuccess: () => {
       setFieldErrors({});
+      toast.success('Form created successfully!', {
+        duration: 5000
+      });
       showMessage("success", "Form created successfully!");
       setTimeout(() => onClose(false), 800);
     },
@@ -106,15 +114,6 @@ function OpenForm({ onClose }: { onClose: Dispatch<React.SetStateAction<boolean>
   return (
     <section className="fixed inset-0 min-h-screen bg-black/20 z-50 p-8 overflow-y-auto">
       <div className="relative w-full max-w-3xl mx-auto bg-white p-6 rounded-2xl">
-
-        {message && (
-          <div
-            className={`mb-4 p-3 rounded-lg text-white ${message.type === "error" ? "bg-red-600" : "bg-green-600"
-              }`}
-          >
-            {message.text}
-          </div>
-        )}
 
         <div className="flex items-center justify-between">
           <span className="font-semibold text-zinc-800 text-lg">Add New Form</span>
@@ -189,6 +188,15 @@ function OpenForm({ onClose }: { onClose: Dispatch<React.SetStateAction<boolean>
         >
           {isPending ? <Spinner /> : "Create Form"}
         </button>
+
+        {message && (
+          <div
+            className={`mb-4 p-3 rounded-lg text-white ${message.type === "error" ? "bg-red-600" : "bg-green-600"
+              }`}
+          >
+            {message.text}
+          </div>
+        )}
       </div>
     </section>
   );
