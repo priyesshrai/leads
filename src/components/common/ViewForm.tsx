@@ -2,8 +2,10 @@
 import { X } from "lucide-react";
 import Spinner from "../ui/spinner";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import { useState } from "react";
+import toast from "react-hot-toast";
 
 interface Field {
     id: string;
@@ -16,9 +18,18 @@ interface Field {
 export default function ViewForm() {
     const searchParams = useSearchParams();
     const router = useRouter();
-
     const formId = searchParams.get("view");
     const hasFormId = !!formId;
+    const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+    const [formValues, setFormValues] = useState<Record<string, any>>({});
+    const handleChange = (field: Field, value: any) => {
+        setFormValues((prev) => ({
+            ...prev,
+            [field.id]: value,
+        }));
+    };
+
 
     const { data, isLoading, isError } = useQuery({
         queryKey: ["view-form", formId],
@@ -48,20 +59,46 @@ export default function ViewForm() {
             case "email":
             case "number":
             case "date":
-                return <input type={field.type} placeholder={field.label} className={baseClass} />;
-
-            case "file":
-                return <input type="file" className={baseClass} />;
+                return (
+                    <input
+                        type={field.type}
+                        placeholder={field.label}
+                        className={baseClass}
+                        onChange={(e) => handleChange(field, e.target.value)}
+                    />
+                );
 
             case "textarea":
-                return <textarea placeholder={field.label} rows={3} className={baseClass} />;
+                return (
+                    <textarea
+                        placeholder={field.label}
+                        rows={3}
+                        className={baseClass}
+                        onChange={(e) => handleChange(field, e.target.value)}
+                    />
+                );
+
+            case "file":
+                return (
+                    <input
+                        type="file"
+                        className={baseClass}
+                        multiple
+                        onChange={(e) => handleChange(field, e.target.files)}
+                    />
+                );
 
             case "select":
                 return (
-                    <select className={baseClass}>
+                    <select
+                        className={baseClass}
+                        onChange={(e) => handleChange(field, e.target.value)}
+                    >
                         <option value="">Select...</option>
                         {options.map((opt) => (
-                            <option key={opt} value={opt}>{opt}</option>
+                            <option key={opt} value={opt}>
+                                {opt}
+                            </option>
                         ))}
                     </select>
                 );
@@ -71,7 +108,12 @@ export default function ViewForm() {
                     <div className="flex flex-col gap-2">
                         {options.map((opt) => (
                             <label key={opt} className="flex items-center gap-2 text-sm">
-                                <input type="radio" name={field.id} />
+                                <input
+                                    type="radio"
+                                    name={field.id}
+                                    value={opt}
+                                    onChange={() => handleChange(field, opt)}
+                                />
                                 <span>{opt}</span>
                             </label>
                         ))}
@@ -83,7 +125,22 @@ export default function ViewForm() {
                     <div className="flex flex-col gap-2">
                         {options.map((opt) => (
                             <label key={opt} className="flex items-center gap-2 text-sm">
-                                <input type="checkbox" />
+                                <input
+                                    type="checkbox"
+                                    value={opt}
+                                    onChange={(e) => {
+                                        const checked = e.target.checked;
+                                        setFormValues((prev) => {
+                                            const prevValues = prev[field.id] || [];
+                                            return {
+                                                ...prev,
+                                                [field.id]: checked
+                                                    ? [...prevValues, opt]
+                                                    : prevValues.filter((v: string) => v !== opt),
+                                            };
+                                        });
+                                    }}
+                                />
                                 <span>{opt}</span>
                             </label>
                         ))}
@@ -94,6 +151,50 @@ export default function ViewForm() {
                 return <p className="text-zinc-500 text-sm">Unsupported field type</p>;
         }
     };
+
+    const submitMutation = useMutation({
+        mutationFn: async (formData: FormData) => {
+            const res = await axios.post(
+                `/api/v1/form/${formId}/response`,
+                formData,
+                { withCredentials: true }
+            );
+            return res.data;
+        },
+        onSuccess: () => {
+            setMessage({ type: "success", text: "Form data successfully!" });
+            toast.success('Form updated successfully!', {
+                duration: 5000
+            });
+        },
+        onError: (err: any) => {
+            const msg = err?.response?.data?.error || "Data submission failed";
+            setMessage({ type: "error", text: msg });
+            toast.error('Update failed. Try again.', {
+                duration: 5000
+            });
+        },
+    });
+
+
+    const handleTestSubmit = () => {
+        const formData = new FormData();
+
+        Object.entries(formValues).forEach(([fieldId, value]) => {
+            if (value instanceof FileList) {
+                for (let i = 0; i < value.length; i++) {
+                    formData.append(fieldId, value[i]);
+                }
+            } else if (Array.isArray(value)) {
+                value.forEach((v) => formData.append(fieldId, v));
+            } else {
+                formData.append(fieldId, value);
+            }
+        });
+
+        submitMutation.mutate(formData);
+    };
+
 
     if (!hasFormId) return null;
 
@@ -167,6 +268,26 @@ export default function ViewForm() {
                             })}
 
                         </div>
+
+                        <div className="space-y-3 animate-fadeIn mt-5">
+                            <button
+                                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg cursor-pointer"
+                                onClick={handleTestSubmit}
+                                disabled={submitMutation.isPending}
+                            >
+                                {submitMutation.isPending ? <Spinner color="white" /> : "Submit Test Data"}
+                            </button>
+
+                        </div>
+
+                        {message && (
+                            <p
+                                className={`mt-3 text-center ${message.type === "success" ? "text-green-600" : "text-red-600"
+                                    }`}
+                            >
+                                {message.text}
+                            </p>
+                        )}
                     </>
                 )}
 
