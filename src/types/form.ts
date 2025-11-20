@@ -55,6 +55,7 @@ export const updateFormFieldSchema = z
 
         type: z.enum([
             "text",
+            "email",
             "textarea",
             "select",
             "radio",

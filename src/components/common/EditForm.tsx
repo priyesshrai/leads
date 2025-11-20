@@ -21,7 +21,7 @@ interface FormField {
     id?: string;
     label: string;
     type: string;
-    required: boolean;
+    required?: boolean;
     options?: string[];
     optionsText?: string;
 }
@@ -115,6 +115,9 @@ export default function EditForm() {
             toast.success('Form updated successfully!', {
                 duration: 5000
             });
+            queryClient.invalidateQueries({ queryKey: ["view-form", formId] });
+            queryClient.invalidateQueries({ queryKey: ["update-form"] });
+            queryClient.invalidateQueries({ queryKey: ["forms"] });
             setTimeout(closeModal, 800);
         },
         onError: (err: any) => {
