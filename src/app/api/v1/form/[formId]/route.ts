@@ -223,6 +223,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ fo
                         console.error("Cloudinary delete error:", err);
                     }
                 }
+                
+                await tx.responseAnswer.deleteMany({
+                    where: { fieldId: { in: toDelete } }
+                });
 
                 await tx.response.deleteMany({
                     where: {

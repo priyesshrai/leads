@@ -186,12 +186,12 @@ function OpenForm({ onClose }: { onClose: Dispatch<React.SetStateAction<boolean>
           disabled={isPending}
           className="mt-8 bg-green-600 w-full py-3 rounded-xl text-white font-medium flex items-center justify-center"
         >
-          {isPending ? <Spinner /> : "Create Form"}
+          {isPending ? <Spinner color="white" /> : "Create Form"}
         </button>
 
         {message && (
           <div
-            className={`mb-4 p-3 rounded-lg text-white ${message.type === "error" ? "bg-red-600" : "bg-green-600"
+            className={`mt-4 p-3 rounded-lg text-white ${message.type === "error" ? "bg-red-600" : "bg-green-600"
               }`}
           >
             {message.text}

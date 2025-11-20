@@ -3,11 +3,12 @@ import { X } from "lucide-react";
 import Input from "./ui/Input";
 
 interface FormField {
+    id?: string;
     label: string;
     type: string;
     required: boolean;
-    options: string[];
-    optionsText: string;
+    options?: string[];
+    optionsText?: string;
 }
 interface Props {
     index: number;

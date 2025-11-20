@@ -7,6 +7,7 @@ import Link from "next/link";
 import { ArrowRight, ListChecks, CalendarDays, Pencil, Trash2Icon } from "lucide-react";
 import ViewForm from "./common/ViewForm";
 import toast, { Toaster } from 'react-hot-toast';
+import EditForm from "./common/EditForm";
 
 interface FormField {
     id: string;
@@ -146,7 +147,7 @@ export default function FormsList() {
                         <div className="flex items-center justify-between mt-4">
                             <div className=" flex gap-2">
                                 <Link
-                                    href={`/system_admin/forms/edit/${form.id}`}
+                                    href={`/admin/forms?update=${form.id}`}
                                     className="w-8 h-8 flex items-center justify-center rounded-full bg-blue-600 text-white shadow hover:bg-blue-700 transition-all duration-200"
                                     title="Edit Form"
                                 >
@@ -159,7 +160,7 @@ export default function FormsList() {
                                     disabled={deletingId === form.id}
                                 >
                                     {deletingId === form.id ? (
-                                        <Spinner />
+                                        <Spinner color="white" />
                                     ) : (
                                         <Trash2Icon size={14} />
                                     )}
@@ -205,6 +206,7 @@ export default function FormsList() {
                 </div>
             )}
             <ViewForm />
+            <EditForm />
             <Toaster />
         </div>
     );

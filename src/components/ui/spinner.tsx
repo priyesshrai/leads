@@ -5,7 +5,7 @@ export default function Spinner({ color }: { color?: string }) {
     <div role="status" className="flex items-center justify-center">
       <svg
         aria-hidden="true"
-        className={`w-8 h-8 animate-spin ${color ? "text-white fill-white" : "text-blue-600 fill-blue-600"} `}
+        className={`w-5 h-5 animate-spin ${color ? "text-white fill-white" : "text-blue-600 fill-blue-600"} `}
         viewBox="0 0 100 101"
         xmlns="http://www.w3.org/2000/svg"
       >

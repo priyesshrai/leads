@@ -63,7 +63,7 @@ export const updateFormFieldSchema = z
             "date",
             "file",
         ], { error: "Field type is required" }),
-
+        formId: z.string().optional(),
         required: z.boolean().default(false),
 
         options: z.array(
@@ -72,7 +72,7 @@ export const updateFormFieldSchema = z
                 .min(1, "Option cannot be empty")
                 .max(50, "Option too long")
         ).optional(),
-
+        optionsText : z.string().optional(),
         order: z.number().int().min(0).optional(),
     })
     .refine(
@@ -108,6 +108,7 @@ export const createFormSchema = z.object({
         .max(100, "Too many fields in one form")
         .optional(),
 })
+
 export const updateFormSchema = z.object({
     title: z
         .string({ error: "Form title is required" })
@@ -124,5 +125,11 @@ export const updateFormSchema = z.object({
     fields: z.array(updateFormFieldSchema).optional(),
 })
 
+
+
+
+
 export type FormFieldsSchema = z.infer<typeof formFieldSchema>
 export type FormSchema = z.infer<typeof createFormSchema>
+export type UpdateFormSchema = z.infer<typeof updateFormSchema>
+export type UpdateFormFields = z.infer<typeof updateFormFieldSchema>
