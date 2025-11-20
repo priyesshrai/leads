@@ -170,7 +170,11 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
             );
         }
 
-        await verifyRole(["ADMIN","SUPERADMIN"])
+        await verifyRole(["ADMIN", "SUPERADMIN"])
+        const { searchParams } = new URL(req.url);
+        const page = Math.max(Number(searchParams.get("page")) || 1, 1);
+        const limit = Math.min(Math.max(Number(searchParams.get("limit")) || 20, 1), 50);
+        const skip = (page - 1) * limit;
         const { formId } = await params;
 
         const form = await prisma.form.findUnique({
@@ -178,6 +182,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
             include: {
                 fields: true,
                 responses: {
+                    skip,
+                    take: limit,
                     orderBy: { submittedAt: "desc" },
                     include: {
                         answers: true,
@@ -188,6 +194,19 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
 
         if (!form) {
             return NextResponse.json({ error: "Form not found" }, { status: 404 });
+        }
+
+        const responseCount = await prisma.response.count({
+            where: {
+                formId: formId
+            }
+        })
+
+        if (responseCount === 0) {
+            return NextResponse.json(
+                { message: "No response found." },
+                { status: 404 }
+            );
         }
 
         const formatted = form.responses.map((res) => {
@@ -216,12 +235,22 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
             };
         });
 
+
+        const pageCount = Math.ceil(responseCount / limit);
+
         const res = {
             id: form.id,
             formId: form.formsId,
             title: form.title,
             description: form.description,
-            responses: formatted
+            responses: formatted,
+            page,
+            limit,
+            responseCount,
+            pageCount,
+            hasMore: page < pageCount,
+            nextPage: page < pageCount ? page + 1 : null,
+            prevPage: page > 1 ? page - 1 : null,
         }
         return NextResponse.json(res, { status: 200 });
     } catch (error: any) {
