@@ -4,9 +4,7 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_DATABASE_URL")
+  provider = "postgresql"
 }
 
 enum Role {
@@ -34,10 +32,10 @@ model User {
   password            String
   role                Role          @default(ADMIN)
   createdById         String?
-  createdBy           User?         @relation("CreatedAdmins", fields: [createdById], references: [id])
+  createdBy           User?         @relation("CreatedAdmins", fields: [createdById], references: [id], onDelete: SetNull)
   createdAdmins       User[]        @relation("CreatedAdmins")
   accountId           String
-  account             Account       @relation(fields: [accountId], references: [id])
+  account             Account       @relation(fields: [accountId], references: [id], onDelete: Cascade)
   managedUsers        ManagedUser[]
   forms               Form[]
   resetToken          String?
@@ -54,7 +52,7 @@ model ManagedUser {
   roleTitle String?
   createdAt DateTime @default(now())
 
-  admin User @relation(fields: [adminId], references: [id])
+  admin User @relation(fields: [adminId], references: [id], onDelete: Cascade)
 }
 
 model Form {
@@ -68,8 +66,8 @@ model Form {
   responses   Response[]
   createdAt   DateTime    @default(now())
 
-  user      User     @relation(fields: [userId], references: [id])
-  account   Account? @relation(fields: [accountId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  account   Account? @relation(fields: [accountId], references: [id], onDelete: Cascade)
   accountId String?
 }
 
@@ -81,7 +79,7 @@ model FormField {
   options         Json?
   required        Boolean          @default(false)
   order           Int?
-  form            Form             @relation(fields: [formId], references: [id])
+  form            Form             @relation(fields: [formId], references: [id], onDelete: Cascade)
   responseAnswers ResponseAnswer[]
 }
 
@@ -89,7 +87,7 @@ model Response {
   id          String           @id @default(uuid())
   formId      String
   submittedAt DateTime         @default(now())
-  form        Form             @relation(fields: [formId], references: [id])
+  form        Form             @relation(fields: [formId], references: [id], onDelete: Cascade)
   answers     ResponseAnswer[]
 }
 
@@ -99,6 +97,6 @@ model ResponseAnswer {
   fieldId    String
   value      String
 
-  response Response  @relation(fields: [responseId], references: [id])
-  field    FormField @relation(fields: [fieldId], references: [id])
+  response Response  @relation(fields: [responseId], references: [id], onDelete: Cascade)
+  field    FormField @relation(fields: [fieldId], references: [id], onDelete: Cascade)
 }

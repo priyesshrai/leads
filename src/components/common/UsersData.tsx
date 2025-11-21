@@ -2,7 +2,6 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useMemo, useState, useEffect } from "react";
-import { styled } from '@mui/material/styles';
 
 import {
     DataGrid,

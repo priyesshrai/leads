@@ -29,7 +29,11 @@ export async function GET(req: Request) {
             include: { fields: true },
         })
 
-        const totalForm = await prisma.form.count();
+        const totalForm = await prisma.form.count({
+            where:{
+                userId:user.id
+            }
+        });
 
         if (forms.length === 0) {
             return NextResponse.json(
