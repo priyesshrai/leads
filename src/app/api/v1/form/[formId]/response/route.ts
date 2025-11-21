@@ -209,7 +209,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
             );
         }
 
-        const formatted = form.responses.map((res) => {
+        const formatted = form.responses.map((res,idx) => {
             const answerMap: Record<string, any> = {};
 
             for (const ans of res.answers) {
@@ -229,6 +229,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
             }
 
             return {
+                idx: idx + 1,
                 responseId: res.id,
                 submittedAt: res.submittedAt,
                 answers: answerMap,
@@ -246,7 +247,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
             responses: formatted,
             page,
             limit,
-            responseCount,
+            totalResponse : responseCount,
             pageCount,
             hasMore: page < pageCount,
             nextPage: page < pageCount ? page + 1 : null,

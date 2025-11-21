@@ -4,7 +4,7 @@ import axios from "axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Spinner from "./ui/spinner";
 import Link from "next/link";
-import { ArrowRight, ListChecks, CalendarDays, Pencil, Trash2Icon } from "lucide-react";
+import { ArrowRight, ListChecks, CalendarDays, Pencil, Trash2Icon, EyeIcon } from "lucide-react";
 import ViewForm from "./common/ViewForm";
 import toast, { Toaster } from 'react-hot-toast';
 import EditForm from "./common/EditForm";
@@ -165,6 +165,14 @@ export default function FormsList() {
                                         <Trash2Icon size={14} />
                                     )}
                                 </button>
+
+                                <Link
+                                    href={`/admin/forms/view?id=${form.id}`}
+                                    className="w-8 h-8 flex items-center justify-center rounded-full bg-green-600 text-white shadow hover:bg-green-700 transition-all duration-200"
+                                    title="Edit Form"
+                                >
+                                    <EyeIcon size={14} />
+                                </Link>
 
                             </div>
 
