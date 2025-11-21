@@ -51,6 +51,10 @@ export default function UsersData({ formId }: { formId: string }) {
 
     const [columnVisibilityModel, setColumnVisibilityModel] = useState<any>({});
     const [openResponse, setOpenResponse] = useState<FormResponseItem | null>(null);
+    const [paginationModel, setPaginationModel] = useState({
+        pageSize: 20,
+        page: 0,
+    });
 
     useEffect(() => {
         if (typeof window === "undefined") return;
@@ -67,7 +71,10 @@ export default function UsersData({ formId }: { formId: string }) {
         queryKey: ["form_responses", formId, page, pageSize],
         queryFn: async () => {
             const res = await axios.get(`/api/v1/form/${formId}/response`, {
-                params: { page: page + 1, limit: pageSize },
+                params: {
+                    page: paginationModel.page + 1,
+                    limit: paginationModel.pageSize,
+                },
                 withCredentials: true,
             });
             return res.data;
@@ -153,6 +160,10 @@ export default function UsersData({ formId }: { formId: string }) {
                 columnVisibilityModel={columnVisibilityModel}
                 onColumnVisibilityModelChange={setColumnVisibilityModel}
                 onRowClick={(params) => setOpenResponse(params.row)}
+                paginationMode="server"
+                rowCount={data?.totalResponse || 0}
+                paginationModel={paginationModel}
+                onPaginationModelChange={(newModel) => setPaginationModel(newModel)}
                 slots={{
                     toolbar: GridToolbar,
                 }}
