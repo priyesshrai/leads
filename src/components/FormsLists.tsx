@@ -4,7 +4,7 @@ import axios from "axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Spinner from "./ui/spinner";
 import Link from "next/link";
-import { ArrowRight, ListChecks, CalendarDays, Pencil, Trash2Icon, EyeIcon } from "lucide-react";
+import { ArrowRight, ListChecks, CalendarDays, Pencil, Trash2Icon, EyeIcon, CopyIcon } from "lucide-react";
 import ViewForm from "./common/ViewForm";
 import toast, { Toaster } from 'react-hot-toast';
 import EditForm from "./common/EditForm";
@@ -55,6 +55,7 @@ export default function FormsList() {
     const limit = 10;
     const queryClient = useQueryClient();
     const [deletingId, setDeletingId] = useState<string | null>(null);
+    const [copyLoading, setCopyLoading] = useState<boolean>(false)
 
 
     const { data, isLoading, isError } = useQuery({
@@ -90,6 +91,16 @@ export default function FormsList() {
         }
     });
 
+    function handleCopy(formId: string) {
+        setCopyLoading(true);
+        if (!formId) {
+            return toast.error("Unable to copy link...! try after some time")
+        }
+        const link = `http://localhost:3001/${formId}/submit`
+        navigator.clipboard.writeText(link)
+        setCopyLoading(false);
+        return toast("Copied...!")
+    }   
 
     return (
         <div className="relative w-full flex flex-col gap-8">
@@ -169,10 +180,21 @@ export default function FormsList() {
                                 <Link
                                     href={`/admin/forms/view?id=${form.id}`}
                                     className="w-8 h-8 flex items-center justify-center rounded-full bg-green-600 text-white shadow hover:bg-green-700 transition-all duration-200"
-                                    title="Edit Form"
+                                    title="View Form"
                                 >
                                     <EyeIcon size={14} />
                                 </Link>
+
+                                <button
+                                    className="cursor-pointer w-8 h-8 flex items-center justify-center rounded-full bg-gray-300 text-black shadow hover:bg-gray-400 transition-all duration-200"
+                                    title="Copy Form Link"
+                                    onClick={() => handleCopy(form.id)}
+                                >
+                                    {
+                                        copyLoading ? <Spinner /> : <CopyIcon size={14} />
+                                    }
+
+                                </button>
 
                             </div>
 
