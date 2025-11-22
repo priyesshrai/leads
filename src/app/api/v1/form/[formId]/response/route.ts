@@ -6,6 +6,18 @@ import { verifyRole } from "@/src/lib/verifyRole";
 
 export const runtime = "nodejs";
 
+function corsHeaders() {
+    return {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    };
+}
+export async function OPTIONS() {
+    return NextResponse.json({}, { status: 200, headers: corsHeaders() });
+}
+
+
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME!,
     api_key: process.env.CLOUDINARY_API_KEY!,
@@ -39,6 +51,8 @@ async function uploadToCloudinaryBuffer(buffer: Buffer, fieldId: string) {
 
 // Saving form data in DB(any one).
 export async function POST(req: NextRequest, { params }: { params: Promise<{ formId: string }> }) {
+    const headers = corsHeaders();
+
     const fileMap: Record<string, File[]> = {};
     try {
         const ip = req.headers.get("x-forwarded-for") || "unknown";
@@ -53,7 +67,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
         const { formId } = await params;
 
         if (!formId || formId.trim() === "") {
-            return NextResponse.json({ error: "Invalid form ID" }, { status: 400 });
+            return NextResponse.json(
+                { error: "Invalid form ID" },
+                { status: 400, headers }
+            );
         }
 
         const form = await prisma.form.findFirst({
@@ -62,18 +79,20 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
         });
 
         if (!form) {
-            return NextResponse.json({ error: "Form not found" }, { status: 404 });
+            return NextResponse.json(
+                { error: "Form not found" },
+                { status: 404, headers }
+            );
         }
 
         const formData = await req.formData();
-
         const incoming: Record<string, any> = {};
 
         for (const ff of form.fields) {
             const values = formData.getAll(ff.id);
 
-            const files: File[] = values.filter((v) => v instanceof File) as File[];
-            const texts: string[] = values.filter((v) => typeof v === "string") as string[];
+            const files = values.filter((v) => v instanceof File) as File[];
+            const texts = values.filter((v) => typeof v === "string") as string[];
 
             if (texts.length === 1) incoming[ff.id] = texts[0];
             else if (texts.length > 1) incoming[ff.id] = texts;
@@ -88,8 +107,36 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
             if (ff.required && !simple && (!file || file.length === 0)) {
                 return NextResponse.json(
                     { error: `Field "${ff.label}" is required` },
-                    { status: 400 }
+                    { status: 400, headers }
                 );
+            }
+        }
+        const uploadedFiles: Record<string, string[]> = {};
+
+        for (const ff of form.fields) {
+            const fileList = fileMap[ff.id];
+            if (!fileList) continue;
+
+            uploadedFiles[ff.id] = [];
+
+            for (const file of fileList) {
+                if (!ALLOWED_MIME.includes(file.type)) {
+                    return NextResponse.json(
+                        { error: `File type ${file.type} not allowed` },
+                        { status: 400, headers }
+                    );
+                }
+
+                if (file.size > MAX_FILE_SIZE) {
+                    return NextResponse.json(
+                        { error: `File ${file.name} exceeds 20MB limit` },
+                        { status: 400, headers }
+                    );
+                }
+
+                const buffer = Buffer.from(await file.arrayBuffer());
+                const uploaded = await uploadToCloudinaryBuffer(buffer, ff.id);
+                uploadedFiles[ff.id].push(uploaded.url);
             }
         }
 
@@ -97,47 +144,26 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
             const response = await tx.response.create({
                 data: { formId: form.id },
             });
+
             for (const ff of form.fields) {
                 const simpleValue = incoming[ff.id];
-                const fileList = fileMap[ff.id];
+                const urls = uploadedFiles[ff.id];
 
-                if (fileList && fileList.length > 0) {
-                    const urls: string[] = [];
+                let finalValue = "";
 
-                    for (const file of fileList) {
-                        if (!ALLOWED_MIME.includes(file.type)) {
-                            throw new Error(`File type ${file.type} not allowed`);
-                        }
-                        if (file.size > MAX_FILE_SIZE) {
-                            throw new Error(`File ${file.name} exceeds 20MB limit`);
-                        }
-
-                        const buffer = Buffer.from(await file.arrayBuffer());
-                        const uploaded = await uploadToCloudinaryBuffer(buffer, ff.id);
-                        urls.push(uploaded.url);
-                    }
-
-                    await tx.responseAnswer.create({
-                        data: {
-                            responseId: response.id,
-                            fieldId: ff.id,
-                            value: urls.length === 1 ? urls[0] : JSON.stringify(urls),
-                        },
-                    });
-
-                    continue;
-                }
-                const finalVal = simpleValue
-                    ? Array.isArray(simpleValue)
+                if (urls?.length) {
+                    finalValue = urls.length === 1 ? urls[0] : JSON.stringify(urls);
+                } else if (simpleValue) {
+                    finalValue = Array.isArray(simpleValue)
                         ? JSON.stringify(simpleValue)
-                        : String(simpleValue)
-                    : "";
+                        : String(simpleValue);
+                }
 
                 await tx.responseAnswer.create({
                     data: {
                         responseId: response.id,
                         fieldId: ff.id,
-                        value: finalVal,
+                        value: finalValue,
                     },
                 });
             }
@@ -147,7 +173,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
 
         return NextResponse.json(
             { success: true, responseId: result.id },
-            { status: 201 }
+            { status: 201, headers }
         );
     } catch (err: any) {
         console.error("Submit error:", err);
@@ -209,7 +235,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
             );
         }
 
-        const formatted = form.responses.map((res,idx) => {
+        const formatted = form.responses.map((res, idx) => {
             const answerMap: Record<string, any> = {};
 
             for (const ans of res.answers) {
@@ -247,7 +273,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
             responses: formatted,
             page,
             limit,
-            totalResponse : responseCount,
+            totalResponse: responseCount,
             pageCount,
             hasMore: page < pageCount,
             nextPage: page < pageCount ? page + 1 : null,

@@ -23,7 +23,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
                 { status: 429 }
             );
         }
-        const user = await verifyRole(["ADMIN", "SUPERADMIN"])
+        // const user = await verifyRole(["ADMIN", "SUPERADMIN"])
         const { formId } = await params
 
         if (!formId || formId.trim() === "") {
@@ -31,7 +31,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
         }
 
         const form = await prisma.form.findFirst({
-            where: { id: formId, userId: user.id },
+            where: { id: formId },
             include: { fields: true },
         })
         if (!form) return NextResponse.json({ error: "Form not found" }, { status: 404 })
