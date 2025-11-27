@@ -5,8 +5,8 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export async function sendLoginDetails(email: string, name: string, password: string) {
 
   const { error } = await resend.emails.send({
-    from: 'Login Credentials <onboarding@resend.dev>',
-    to: ['priyeshrai.dev@gmail.com'],
+    from: 'Login Credentials <leads@wizards.co.in>',
+    to: [email],
     subject: 'Login credentials for your account',
     html: `
       <div style="font-family: Arial; padding: 16px">
