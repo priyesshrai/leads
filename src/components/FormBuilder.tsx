@@ -1,35 +1,45 @@
 "use client";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import FieldItem from "./FieldItem";
 import { Loader2 } from "lucide-react";
 import { useCreateForm } from "../hooks/useCreateForm";
 
+interface FormField {
+    id?: string;
+    label: string;
+    type: string;
+    required?: boolean;
+    options?: string[];
+    optionsText?: string;
+}
+
 export default function FormBuilder() {
 
-    const [title, setTitle] = useState("");
-    const [description, setDescription] = useState("");
-    const [fields, setFields] = useState([]);
+
+    const [title, setTitle] = useState<string>("");
+    const [description, setDescription] = useState<string>("");
+    const [fields, setFields] = useState<FormField[]>([]);
 
     const { mutateAsync, isPending } = useCreateForm();
 
     const addField = () => {
         setFields((prev) => [
             ...prev,
-            { label: "", type: "text", required: false, options: [] },
+            { label: "", type: "text", required: false, options: [], optionsText: '' },
         ]);
     };
 
-    const updateField = (index, updates) => {
+    const updateField = (index: number, updates: Partial<FormField>) => {
         setFields((prev) =>
             prev.map((f, i) => (i === index ? { ...f, ...updates } : f))
         );
     };
 
-    const removeField = (index) => {
+    const removeField = (index: number) => {
         setFields((prev) => prev.filter((_, i) => i !== index));
     };
 
-    const onSubmit = async (e) => {
+    const onSubmit = async (e: FormEvent) => {
         e.preventDefault();
 
         if (!title.trim()) {
