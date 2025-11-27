@@ -15,7 +15,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ acco
             );
         }
 
-        await verifyRole("SUPERADMIN");
+        await verifyRole(["SUPERADMIN","ADMIN"]);
 
         const { account_id } = await params;
         if (!account_id || account_id.trim() === "") {

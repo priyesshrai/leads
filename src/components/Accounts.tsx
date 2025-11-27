@@ -7,6 +7,9 @@ import Spinner from "./ui/spinner";
 import { generateNameInitials } from "../lib/generatePassword";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import AccountDropDown from "./AccountDropDown";
+import { Toaster } from "react-hot-toast";
+
 
 interface Account {
     id: string;
@@ -69,11 +72,7 @@ export default function Accounts() {
                 {data?.users?.map((acc) => (
                     <div
                         key={acc.id}
-                        className="
-                            relative rounded-2xl bg-white p-6 shadow-md border border-zinc-200 
-                            transition-all duration-300 hover:shadow-xl hover:-translate-y-1
-                            flex flex-col gap-4
-                        "
+                        className="relative rounded-2xl bg-white p-6 shadow-md border border-zinc-200 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col gap-4"
                     >
                         <div
                             className=" pointer-events-none select-none
@@ -111,16 +110,16 @@ export default function Accounts() {
                             Created • {new Date(acc.createdAt).toLocaleDateString()}
                         </p>
 
-                        <Link
-                            href={`/system_admin/accounts/${acc.id}`}
-                            className="
-                                mt-4 inline-flex items-center gap-2 text-blue-600 
-                                font-medium text-sm hover:underline group w-max
-                            "
-                        >
-                            View Profile
-                            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-all" />
-                        </Link>
+                        <div className="relative w-full flex items-center justify-between mt-4">
+                            <AccountDropDown details={acc} page={page} limit={limit} />
+                            <Link
+                                href={`/system_admin/accounts/${acc.id}`}
+                                className="inline-flex items-center gap-2 text-blue-600 font-medium text-sm hover:underline group w-max"
+                            >
+                                View Profile
+                                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-all" />
+                            </Link>
+                        </div>
                     </div>
                 ))}
             </div>
@@ -162,6 +161,7 @@ export default function Accounts() {
 
                 </div>
             )}
+            <Toaster />
         </div>
     );
 }
