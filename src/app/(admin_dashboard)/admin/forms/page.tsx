@@ -1,4 +1,6 @@
 import FormsLists from "@/src/components/FormsLists";
+import Spinner from "@/src/components/ui/spinner";
+import { Suspense } from "react";
 
 export default function FormPage() {
   return (
@@ -7,7 +9,9 @@ export default function FormPage() {
         All Form List
       </h1>
       <div className='relative mt-8'>
-        <FormsLists />
+        <Suspense fallback={<Spinner />}>
+          <FormsLists />
+        </Suspense>
       </div>
     </section>
   )
