@@ -3,7 +3,7 @@ import { Resend } from 'resend';
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function SendPasswordResetEmail(email: string, token: string) {
-  const resetUrl = `http://localhost:3000/reset-password?token=${token}`;
+  const resetUrl = `https://leads.wizards.co.in/reset-password?token=${token}`;
 
   const { data, error } = await resend.emails.send({
     from: 'Reset Your Password <leads@wizards.co.in>',

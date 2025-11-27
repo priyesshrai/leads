@@ -96,7 +96,7 @@ export default function FormsList() {
         if (!formId) {
             return toast.error("Unable to copy link...! try after some time")
         }
-        const link = `http://localhost:3001/${formId}/submit`
+        const link = `https://forms.wizards.co.in/${formId}/submit`
         navigator.clipboard.writeText(link)
         setCopyLoading(false);
         return toast("Copied...!")
