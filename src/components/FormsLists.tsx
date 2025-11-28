@@ -1,13 +1,14 @@
 "use client";
 import { useState } from "react";
 import axios from "axios";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import Spinner from "./ui/spinner";
 import Link from "next/link";
-import { ArrowRight, ListChecks, CalendarDays, Pencil, Trash2Icon, EyeIcon, CopyIcon } from "lucide-react";
+import { ArrowRight, ListChecks, CalendarDays } from "lucide-react";
 import ViewForm from "./common/ViewForm";
-import toast, { Toaster } from 'react-hot-toast';
+import { Toaster } from 'react-hot-toast';
 import EditForm from "./common/EditForm";
+import FormDropDown from "./FormDropDown";
 
 interface FormField {
     id: string;
@@ -54,10 +55,6 @@ async function fetchForms(page: number, limit: number = 10, accountId: string): 
 export default function FormsList({ accountId }: { accountId?: string }) {
     const [page, setPage] = useState(1);
     const limit = 10;
-    const queryClient = useQueryClient();
-    const [deletingId, setDeletingId] = useState<string | null>(null);
-    const [copyLoading, setCopyLoading] = useState<boolean>(false)
-
 
     const { data, isLoading, isError } = useQuery({
         queryKey: ["forms", page, limit, accountId],
@@ -68,40 +65,6 @@ export default function FormsList({ accountId }: { accountId?: string }) {
 
     const forms = data?.response?.forms ?? [];
     const pagination = data?.response;
-
-    const deleteMutation = useMutation({
-        mutationFn: async (formId: string) => {
-            setDeletingId(formId);
-            return await axios.delete(`/api/v1/form/${formId}`, {
-                withCredentials: true,
-            });
-        },
-        onSuccess: () => {
-            toast.success('Form deleted successfully', {
-                duration: 5000
-            });
-            queryClient.invalidateQueries({ queryKey: ["forms"] });
-        },
-        onSettled: () => {
-            setDeletingId(null);
-        },
-        onError: () => {
-            toast.error('Something went wrong, can\'t delete the form.', {
-                duration: 5000
-            });
-        }
-    });
-
-    function handleCopy(formId: string) {
-        setCopyLoading(true);
-        if (!formId) {
-            return toast.error("Unable to copy link...! try after some time")
-        }
-        const link = `https://forms.wizards.co.in/${formId}/submit`
-        navigator.clipboard.writeText(link)
-        setCopyLoading(false);
-        return toast("Copied...!")
-    }
 
     return (
         <div className="relative w-full flex flex-col gap-8">
@@ -125,7 +88,7 @@ export default function FormsList({ accountId }: { accountId?: string }) {
             )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {forms.map((form) => (
+                {forms.map((form:FormItem) => (
                     <div
                         key={form.id}
                         className="relative rounded-2xl bg-white p-6 shadow-md border border-zinc-200 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col gap-4"
@@ -157,47 +120,7 @@ export default function FormsList({ accountId }: { accountId?: string }) {
                         </div>
 
                         <div className="flex items-center justify-between mt-4">
-                            <div className=" flex gap-2">
-                                <Link
-                                    href={`?update=${form.id}`}
-                                    className="w-8 h-8 flex items-center justify-center rounded-full bg-blue-600 text-white shadow hover:bg-blue-700 transition-all duration-200"
-                                    title="Edit Form"
-                                >
-                                    <Pencil size={14} />
-                                </Link>
-                                <button
-                                    className="w-8 h-8 flex items-center justify-center rounded-full bg-red-300 text-red-700 shadow hover:bg-red-400 transition-all duration-200 cursor-pointer"
-                                    title="Delete form"
-                                    onClick={() => deleteMutation.mutate(form.id)}
-                                    disabled={deletingId === form.id}
-                                >
-                                    {deletingId === form.id ? (
-                                        <Spinner color="white" />
-                                    ) : (
-                                        <Trash2Icon size={14} />
-                                    )}
-                                </button>
-
-                                <Link
-                                    href={`forms/view?id=${form.id}`}
-                                    className="w-8 h-8 flex items-center justify-center rounded-full bg-green-600 text-white shadow hover:bg-green-700 transition-all duration-200"
-                                    title="View Form"
-                                >
-                                    <EyeIcon size={14} />
-                                </Link>
-
-                                <button
-                                    className="cursor-pointer w-8 h-8 flex items-center justify-center rounded-full bg-gray-300 text-black shadow hover:bg-gray-400 transition-all duration-200"
-                                    title="Copy Form Link"
-                                    onClick={() => handleCopy(form.id)}
-                                >
-                                    {
-                                        copyLoading ? <Spinner /> : <CopyIcon size={14} />
-                                    }
-
-                                </button>
-
-                            </div>
+                            <FormDropDown formData={form} />
 
                             <Link
                                 href={`?view=${form.id}`}
