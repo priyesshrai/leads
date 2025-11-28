@@ -21,18 +21,45 @@ export async function GET(req: Request) {
         const page = Math.max(Number(searchParams.get("page")) || 1, 1);
         const limit = Math.min(Math.max(Number(searchParams.get("limit")) || 10, 1), 50);
         const skip = (page - 1) * limit;
+        const queryAccountId = searchParams.get("account_id")?.trim() || "";
+
+        if (queryAccountId !== "") {
+            const validAccount = await prisma.account.findUnique({
+                where: { id: queryAccountId }
+            });
+
+            if (!validAccount) {
+                return NextResponse.json(
+                    { error: "Invalid Account." },
+                    { status: 404 }
+                );
+            }
+        }
+        
+        const account = await prisma.user.findUnique({
+            where: { id: user.id },
+            select: { accountId: true }
+        });
+
+        if (!account?.accountId && queryAccountId === "") {
+            return NextResponse.json(
+                { error: "Account not found." },
+                { status: 404 }
+            );
+        }
+
+        const finalAccountId = queryAccountId !== "" ? queryAccountId : account?.accountId;
+
         const forms = await prisma.form.findMany({
-            where: { userId: user.id },
+            where: { accountId: finalAccountId },
             skip,
             take: limit,
             orderBy: { createdAt: "desc" },
             include: { fields: true },
-        })
+        });
 
         const totalForm = await prisma.form.count({
-            where:{
-                userId:user.id
-            }
+            where: { accountId: finalAccountId }
         });
 
         if (forms.length === 0) {
@@ -78,7 +105,7 @@ export async function POST(req: Request) {
         }
 
         const body = await req.json()
-        
+
         const parsed = createFormSchema.safeParse(body)
         if (!parsed.success) {
             return NextResponse.json(
