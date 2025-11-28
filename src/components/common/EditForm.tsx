@@ -82,7 +82,7 @@ export default function EditForm() {
     const closeModal = () => {
         const params = new URLSearchParams(searchParams.toString());
         params.delete("update");
-        router.push(`/admin/forms${params.toString() ? `?${params}` : ""}`);
+        router.replace(`?${params.toString()}`, { scroll: false });
     };
 
     const addField = () => {

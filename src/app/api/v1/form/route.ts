@@ -5,7 +5,7 @@ import { isRateLimited } from "@/src/lib/limiter"
 import { verifyRole } from "@/src/lib/verifyRole"
 import prisma from "@/src/lib/prisma"
 
-// get all form associted with user only
+// get all form associted with Account
 export async function GET(req: Request) {
     try {
         const ip = req.headers.get("x-forwarded-for") || "unknown";

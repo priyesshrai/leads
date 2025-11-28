@@ -46,8 +46,7 @@ export default function ViewForm() {
     const closeModal = () => {
         const params = new URLSearchParams(searchParams.toString());
         params.delete("view");
-
-        router.push(`/admin/forms${params.toString() ? `?${params}` : ""}`);
+        router.replace(`?${params.toString()}`, { scroll: false });
     };
 
     const renderField = (field: Field, options: string[]) => {
