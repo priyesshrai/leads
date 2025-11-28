@@ -35,7 +35,7 @@ export async function GET(req: Request) {
                 );
             }
         }
-        
+
         const account = await prisma.user.findUnique({
             where: { id: user.id },
             select: { accountId: true }
@@ -99,63 +99,112 @@ export async function POST(req: Request) {
 
         const user = await verifyRole(["SUPERADMIN", "ADMIN"]);
 
-        const contentLength = Number(req.headers.get("content-length") || 0)
+        const contentLength = Number(req.headers.get("content-length") || 0);
         if (contentLength > 50_000) {
-            return NextResponse.json({ error: "Payload too large" }, { status: 413 })
+            return NextResponse.json({ error: "Payload too large" }, { status: 413 });
         }
 
-        const body = await req.json()
+        const { searchParams } = new URL(req.url);
+        const targetAccountIdFromQuery = searchParams.get("account_id");
 
-        const parsed = createFormSchema.safeParse(body)
+        const body = await req.json();
+
+        const userAccount = await prisma.user.findUnique({
+            where: { id: user.id },
+            select: { accountId: true, role: true, name: true }
+        });
+
+        if (!userAccount?.accountId) {
+            return NextResponse.json({ error: "User account not found" }, { status: 404 });
+        }
+
+        let formOwnerUserId = user.id;
+        let formOwnerAccountId = userAccount.accountId;
+        let formOwnerName = userAccount.name;
+
+        if (user.role === "SUPERADMIN") {
+            if (!targetAccountIdFromQuery || typeof targetAccountIdFromQuery !== "string") {
+                return NextResponse.json(
+                    { error: "SUPERADMIN must send account_id in searchParams" },
+                    { status: 400 }
+                );
+            }
+
+            const targetAccount = await prisma.account.findUnique({
+                where: { id: targetAccountIdFromQuery }
+            });
+
+            if (!targetAccount) {
+                return NextResponse.json(
+                    { error: "Target account does not exist" },
+                    { status: 404 }
+                );
+            }
+
+            const firstUser = await prisma.user.findFirst({
+                where: { accountId: targetAccountIdFromQuery },
+                select: { id: true, name: true, accountId: true }
+            });
+
+            if (!firstUser) {
+                return NextResponse.json(
+                    { error: "No users found inside this account" },
+                    { status: 404 }
+                );
+            }
+
+            formOwnerUserId = firstUser.id;
+            formOwnerAccountId = targetAccountIdFromQuery;
+            formOwnerName = firstUser.name;
+        }
+
+        const parsed = createFormSchema.safeParse(body);
         if (!parsed.success) {
             return NextResponse.json(
                 { errors: parsed.error.flatten().fieldErrors },
                 { status: 400 }
-            )
+            );
         }
-        const { title, description, fields } = parsed.data
 
-        const cleanTitle = title.trim()
-        const cleanDescription = description?.trim() || ""
+        const { title, description, fields } = parsed.data;
 
-        const slugBase = slugify(cleanTitle, { lower: true, strict: true })
-        const slug = `${slugBase}-${Date.now()}`
+        const cleanTitle = title.trim();
+        const cleanDescription = description?.trim() || "";
+
+        const slugBase = slugify(cleanTitle, { lower: true, strict: true });
+        const slug = `${slugBase}-${Date.now()}`;
 
         const existing = await prisma.form.findFirst({
-            where: { userId: user.id, title: cleanTitle },
-        })
+            where: {
+                title: cleanTitle,
+                accountId: formOwnerAccountId
+            }
+        });
 
         if (existing) {
             return NextResponse.json(
-                { error: "A form with this title already exists" },
+                { error: "A form with this title already exists for this account" },
                 { status: 400 }
-            )
+            );
         }
-        const formOwner = await prisma.user.findUnique({
-            where: { id: user.id },
-            select: {
-                name: true,
-                accountId: true
-            }
-        })
-        const formCount = await prisma.form.count({
-            where: { userId: user.id },
-        })
 
-        const prefix = formOwner?.name.slice(0, 4).toUpperCase()
-        const formattedCount = String(formCount + 1).padStart(4, "0")
-        const datePart = new Date().toISOString()
-        const uniqueId = `${prefix}-${formattedCount}-${datePart}`
+        const prefix = (formOwnerName || "FORM").slice(0, 4).toUpperCase();
+        const formCount = await prisma.form.count({
+            where: { accountId: formOwnerAccountId }
+        });
+        const formattedCount = String(formCount + 1).padStart(4, "0");
+        const datePart = new Date().toISOString();
+        const uniqueId = `${prefix}-${formattedCount}-${datePart}`;
 
         const result = await prisma.$transaction(async (tx) => {
-            const newForm = await tx.form.create({
+            return tx.form.create({
                 data: {
                     title: cleanTitle,
                     description: cleanDescription,
                     formsId: uniqueId,
                     slug,
-                    userId: user.id,
-                    accountId: formOwner?.accountId,
+                    userId: formOwnerUserId,
+                    accountId: formOwnerAccountId,
                     fields: {
                         create: fields?.map((f, idx) => ({
                             label: f.label.trim(),
@@ -167,14 +216,20 @@ export async function POST(req: Request) {
                     },
                 },
                 include: { fields: true },
-            })
+            });
+        });
 
-            return newForm
-        })
+        return NextResponse.json(
+            { success: true, form: result },
+            { status: 201 }
+        );
 
-        return NextResponse.json({ success: true, form: result }, { status: 201 })
     } catch (err: any) {
-        console.error(err.message)
-        return NextResponse.json({ error: err.message || "Failed to create form" }, { status: 500 })
+        console.error("POST /form error:", err);
+        return NextResponse.json(
+            { error: err.message || "Failed to create form" },
+            { status: 500 }
+        );
     }
 }
+
