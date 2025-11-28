@@ -119,12 +119,12 @@ export default function FormsList({ accountId }: { accountId?: string }) {
                             <span>{new Date(form.createdAt).toLocaleDateString()}</span>
                         </div>
 
-                        <div className="flex items-center justify-between mt-4">
+                        <div className="flex items-center justify-between mt-8">
                             <FormDropDown formData={form} />
 
                             <Link
                                 href={`?view=${form.id}`}
-                                className="mt-4 inline-flex items-center gap-2 text-blue-600 font-medium text-sm hover:underline group w-max"
+                                className="inline-flex items-center gap-2 text-blue-600 font-medium text-sm hover:underline group w-max"
                             >
                                 View Form
                                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-all" />

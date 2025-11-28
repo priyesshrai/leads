@@ -87,7 +87,7 @@ export default function FormDropDown({ formData }: Props) {
                             title="Edit Form"
                         >
                             Edit Form
-                            <Pencil size={14} />
+                            <Pencil size={14} className="text-zinc-700" />
                         </Link>
                     </DropdownMenuItem>
 
@@ -95,10 +95,10 @@ export default function FormDropDown({ formData }: Props) {
                         <Link
                             href={`forms/view?id=${formData.id}`}
                             className="flex items-center justify-between"
-                            title="View Form"
+                            title="View Form Response"
                         >
                             Form Response
-                            <EyeIcon size={14} />
+                            <EyeIcon size={14} className="text-zinc-700" />
                         </Link>
                     </DropdownMenuItem>
 
@@ -110,7 +110,7 @@ export default function FormDropDown({ formData }: Props) {
                         >
                             Copy Link
                             {
-                                copyLoading ? <Spinner /> : <CopyIcon size={14} />
+                                copyLoading ? <Spinner /> : <CopyIcon size={14} className="text-zinc-700" />
                             }
 
                         </button>
@@ -118,6 +118,7 @@ export default function FormDropDown({ formData }: Props) {
 
                     <DropdownMenuSeparator className="bg-gray-300" />
                     <DropdownMenuItem
+                        title="Delete this form"
                         onSelect={(e) => e.preventDefault()}
                         onClick={() => deleteMutation.mutate(formData.id)}
                         disabled={deletingId === formData.id}
@@ -127,7 +128,7 @@ export default function FormDropDown({ formData }: Props) {
                         {deletingId === formData.id ? (
                             <Spinner />
                         ) : (
-                            <Trash2Icon size={14} />
+                            <Trash2Icon size={14} className="text-zinc-700" />
                         )}
                     </DropdownMenuItem>
                 </DropdownMenuGroup>
