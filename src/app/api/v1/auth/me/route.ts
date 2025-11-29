@@ -44,16 +44,8 @@ export async function GET(req: NextRequest) {
         const finalAccountId = queryAccountId !== "" ? queryAccountId : account?.accountId;
 
         const user_account = await prisma.account.findUnique({
-            where: {
-                id: finalAccountId
-            },
+            where: { id: finalAccountId },
             include: {
-                _count: {
-                    select: {
-                        forms: true,
-                        users: true
-                    }
-                },
                 users: {
                     select: {
                         id: true,
@@ -62,6 +54,22 @@ export async function GET(req: NextRequest) {
                         role: true,
                     }
                 },
+                forms: {
+                    select: {
+                        id: true,
+                        _count: {
+                            select: {
+                                responses: true
+                            }
+                        }
+                    }
+                },
+                _count: {
+                    select: {
+                        forms: true,
+                        users: true
+                    }
+                }
             }
         });
 
@@ -71,9 +79,15 @@ export async function GET(req: NextRequest) {
                 { status: 404 }
             );
         }
+        const totalResponses = user_account.forms.reduce(
+            (sum, f) => sum + f._count.responses, 0
+        );
 
         return NextResponse.json(
-            { user_account },
+            {
+                data: user_account,
+                total_response:totalResponses
+            },
             { status: 200 }
         );
 
