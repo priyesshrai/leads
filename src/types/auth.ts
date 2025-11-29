@@ -97,3 +97,41 @@ export interface AuthUser {
   initials: string;
 }
 
+export interface AccountSummaryResponse {
+  data: AccountData;
+  initials: string;
+  total_response: number;
+}
+
+export interface AccountData {
+  id: string;
+  businessName: string;
+  phone: string;
+  location: string;
+  email: string;
+  createdAt: string; // ISO date string
+  users: AccountUser[];
+  forms: AccountForm[];
+  _count: AccountCounts;
+}
+
+export interface AccountUser {
+  id: string;
+  name: string;
+  email: string;
+  role: "ADMIN" | "SUPERADMIN" | "USER" | string;
+}
+
+export interface AccountForm {
+  id: string;
+  _count: FormCounts;
+}
+
+export interface AccountCounts {
+  forms: number;
+  users: number;
+}
+
+export interface FormCounts {
+  responses: number;
+}

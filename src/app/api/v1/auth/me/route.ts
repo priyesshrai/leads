@@ -83,10 +83,13 @@ export async function GET(req: NextRequest) {
             (sum, f) => sum + f._count.responses, 0
         );
 
+        const initials = generateNameInitials(user_account.businessName) 
+
         return NextResponse.json(
             {
                 data: user_account,
-                total_response:totalResponses
+                initials,
+                total_response:totalResponses,
             },
             { status: 200 }
         );
