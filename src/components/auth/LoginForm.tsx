@@ -1,5 +1,5 @@
 'use client';
-import { ChangeEvent, FormEvent, useState } from 'react'
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react'
 import Input from '../ui/Input';
 import { Eye, EyeOff, Mail } from 'lucide-react';
 import { LoginReturn, LoginSchema } from '@/src/types/auth';
@@ -24,8 +24,10 @@ export default function LoginForm() {
                 [name]: value
             }
         ))
-        setDisableButton(!(formValue.email !== '' && formValue.password !== ''));
     }
+    useEffect(() => {
+        setDisableButton(!(formValue.email !== "" && formValue.password !== ""));
+    }, [formValue]);
 
     const loginMutation = useMutation({
         mutationFn: async (payload: LoginSchema): Promise<LoginReturn> => {
@@ -40,7 +42,7 @@ export default function LoginForm() {
             setFormValue({ email: "", password: "" });
             setTimeout(() => {
                 redirect('/admin/dashboard')
-            }, 1500)
+            }, 800)
         },
     });
     const { mutate, isPending, isError, error, isSuccess } = loginMutation;

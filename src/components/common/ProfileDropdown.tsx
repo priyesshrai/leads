@@ -35,11 +35,11 @@ export default function ProfileDropdown({ user }: { user: AuthUser | null}) {
                 <DropdownMenuSeparator />
 
                 <DropdownMenuItem asChild>
-                    <Link href="/account">Account</Link>
+                    <Link href="accounts">Account</Link>
                 </DropdownMenuItem>
 
                 <DropdownMenuItem asChild>
-                    <Link href="/settings">Settings</Link>
+                    <Link href="settings">Settings</Link>
                 </DropdownMenuItem>
 
                 <DropdownMenuSeparator />
