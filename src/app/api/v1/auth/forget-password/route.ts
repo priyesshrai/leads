@@ -3,15 +3,30 @@ import { generateResetJwt } from "@/src/lib/resetJwt";
 import { SendPasswordResetEmail } from "@/src/lib/sendPasswordResetEmail";
 import prisma from "@/src/lib/prisma";
 import { forgetPasswordEMail } from "@/src/types/auth";
+import { isRateLimited } from "@/src/lib/limiter";
 
 export async function POST(req: Request) {
-    const { email } = await req.json();
-    const validEmail = forgetPasswordEMail.safeParse(email)
-    if (!validEmail.success) {
-        return NextResponse.json({ error: "Email validation fail" }, { status: 403 })
-    }
-   
+
     try {
+        const ip = req.headers.get("x-forwarded-for") || "unknown";
+        if (isRateLimited(ip)) {
+            return NextResponse.json(
+                { error: "Too many requests. Try again later." },
+                { status: 429 }
+            );
+        }
+
+        const { email } = await req.json();
+        const validEmail = forgetPasswordEMail.safeParse({ email: email })
+        if (!validEmail.success) {
+            const flat = validEmail.error.flatten().fieldErrors;
+            const firstError = Object.values(flat).flat()[0];
+
+            return NextResponse.json(
+                { error: firstError || "Invalid email" },
+                { status: 400 }
+            );
+        }
         const user = await prisma.user.findUnique({ where: { email } });
 
         if (!user) {
