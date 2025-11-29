@@ -1,11 +1,9 @@
 "use client";
-
 import { AccountSummaryResponse } from "@/src/types/auth";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
 import { usePathname } from "next/navigation";
-import UpdatePassword from "../UpdatePassword";
 import { Toaster } from "react-hot-toast";
 
 export default function ProfileView({ accountId }: { accountId?: string }) {
@@ -90,9 +88,7 @@ export default function ProfileView({ accountId }: { accountId?: string }) {
             </div>
 
             {
-                currentPath.startsWith('/admin') ? (
-                    <UpdatePassword />
-                ) : (
+                !currentPath.startsWith('/admin') && (
                     <div className="p-6 rounded-xl bg-white shadow">
                         <h2 className="text-lg font-semibold text-gray-800 mb-4">
                             Users

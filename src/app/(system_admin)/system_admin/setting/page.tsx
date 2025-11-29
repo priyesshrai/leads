@@ -6,7 +6,7 @@ export default function SettingPage() {
     return (
         <section className='relative w-full p-5'>
             <ProfileView />
-            <UpdatePassword/>
+            <UpdatePassword />
         </section>
     )
 }
