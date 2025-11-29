@@ -4,12 +4,16 @@ import { AccountSummaryResponse } from "@/src/types/auth";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
+import { usePathname } from "next/navigation";
+import UpdatePassword from "../UpdatePassword";
+import { Toaster } from "react-hot-toast";
 
 export default function ProfileView({ accountId }: { accountId?: string }) {
+    const currentPath = usePathname()
     const { data, isLoading, error } = useQuery<AccountSummaryResponse>({
         queryKey: ["view-profile", accountId],
         queryFn: async () => {
-            const res = await axios.get(`/api/v1/auth/me?account_id=${accountId}`, {
+            const res = await axios.get(`/api/v1/auth/me?account_id=${accountId ?? ''}`, {
                 withCredentials: true,
             });
             return res.data;
@@ -51,23 +55,6 @@ export default function ProfileView({ accountId }: { accountId?: string }) {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-                <div className="p-6 rounded-xl bg-white shadow flex flex-col items-start">
-                    <p className="text-gray-500">Total Users</p>
-                    <p className="text-3xl font-semibold">{account._count.users}</p>
-                </div>
-
-                <div className="p-6 rounded-xl bg-white shadow flex flex-col items-start">
-                    <p className="text-gray-500">Total Forms</p>
-                    <p className="text-3xl font-semibold">{account._count.forms}</p>
-                </div>
-
-                <div className="p-6 rounded-xl bg-white shadow flex flex-col items-start">
-                    <p className="text-gray-500">Total Responses</p>
-                    <p className="text-3xl font-semibold">{data.total_response}</p>
-                </div>
-            </div>
-
             <div className="p-6 rounded-xl bg-white shadow">
                 <h2 className="text-lg font-semibold text-gray-800 mb-4">
                     Account Details
@@ -85,26 +72,50 @@ export default function ProfileView({ accountId }: { accountId?: string }) {
                 </div>
             </div>
 
-            <div className="p-6 rounded-xl bg-white shadow">
-                <h2 className="text-lg font-semibold text-gray-800 mb-4">
-                    Users
-                </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                <div className="p-6 rounded-xl bg-white shadow flex flex-col items-start">
+                    <p className="text-gray-500">Total Users</p>
+                    <p className="text-3xl font-semibold">{account._count.users}</p>
+                </div>
 
-                <div className="space-y-3">
-                    {account.users.map((u) => (
-                        <div
-                            key={u.id}
-                            className="p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition"
-                        >
-                            <p className="text-gray-800 font-medium">{u.name}</p>
-                            <p className="text-gray-500 text-sm">{u.email}</p>
-                            <span className="mt-1 inline-block text-xs px-3 py-1 rounded-full bg-blue-100 text-blue-700">
-                                {u.role}
-                            </span>
-                        </div>
-                    ))}
+                <div className="p-6 rounded-xl bg-white shadow flex flex-col items-start">
+                    <p className="text-gray-500">Total Forms</p>
+                    <p className="text-3xl font-semibold">{account._count.forms}</p>
+                </div>
+
+                <div className="p-6 rounded-xl bg-white shadow flex flex-col items-start">
+                    <p className="text-gray-500">Total Responses</p>
+                    <p className="text-3xl font-semibold">{data.total_response}</p>
                 </div>
             </div>
+
+            {
+                currentPath.startsWith('/admin') ? (
+                    <UpdatePassword />
+                ) : (
+                    <div className="p-6 rounded-xl bg-white shadow">
+                        <h2 className="text-lg font-semibold text-gray-800 mb-4">
+                            Users
+                        </h2>
+
+                        <div className="space-y-3">
+                            {account.users.map((u) => (
+                                <div
+                                    key={u.id}
+                                    className="p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition"
+                                >
+                                    <p className="text-gray-800 font-medium">{u.name}</p>
+                                    <p className="text-gray-500 text-sm">{u.email}</p>
+                                    <span className="mt-1 inline-block text-xs px-3 py-1 rounded-full bg-blue-100 text-blue-700">
+                                        {u.role}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )
+            }
+            <Toaster />
         </div>
     );
 }
