@@ -1,4 +1,5 @@
 import UsersData from "@/src/components/common/UsersData";
+import { Toaster } from "react-hot-toast";
 
 export default async function ViewFormData({ searchParams }: { searchParams: Promise<{ id?: string }> }) {
     const { id } = await searchParams;
@@ -16,6 +17,7 @@ export default async function ViewFormData({ searchParams }: { searchParams: Pro
     return (
         <section className='relative p-5'>
             <UsersData formId={id} />
+            <Toaster/>
         </section>
     )
 }

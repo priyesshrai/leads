@@ -52,3 +52,8 @@ export type Response = Prisma.ResponseModel
  * 
  */
 export type ResponseAnswer = Prisma.ResponseAnswerModel
+/**
+ * Model FollowUp
+ * 
+ */
+export type FollowUp = Prisma.FollowUpModel

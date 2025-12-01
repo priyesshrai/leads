@@ -8,7 +8,7 @@
  *
  * 🟢 You can import this file directly.
  */
-import type * as runtime from "@prisma/client/runtime/library"
+import type * as runtime from "@prisma/client/runtime/client"
 import type * as $Enums from "../enums"
 import type * as Prisma from "../internal/prismaNamespace"
 
@@ -168,6 +168,7 @@ export type ResponseWhereInput = {
   submittedAt?: Prisma.DateTimeFilter<"Response"> | Date | string
   form?: Prisma.XOR<Prisma.FormScalarRelationFilter, Prisma.FormWhereInput>
   answers?: Prisma.ResponseAnswerListRelationFilter
+  followUps?: Prisma.FollowUpListRelationFilter
 }
 
 export type ResponseOrderByWithRelationInput = {
@@ -176,6 +177,7 @@ export type ResponseOrderByWithRelationInput = {
   submittedAt?: Prisma.SortOrder
   form?: Prisma.FormOrderByWithRelationInput
   answers?: Prisma.ResponseAnswerOrderByRelationAggregateInput
+  followUps?: Prisma.FollowUpOrderByRelationAggregateInput
 }
 
 export type ResponseWhereUniqueInput = Prisma.AtLeast<{
@@ -187,6 +189,7 @@ export type ResponseWhereUniqueInput = Prisma.AtLeast<{
   submittedAt?: Prisma.DateTimeFilter<"Response"> | Date | string
   form?: Prisma.XOR<Prisma.FormScalarRelationFilter, Prisma.FormWhereInput>
   answers?: Prisma.ResponseAnswerListRelationFilter
+  followUps?: Prisma.FollowUpListRelationFilter
 }, "id">
 
 export type ResponseOrderByWithAggregationInput = {
@@ -212,6 +215,7 @@ export type ResponseCreateInput = {
   submittedAt?: Date | string
   form: Prisma.FormCreateNestedOneWithoutResponsesInput
   answers?: Prisma.ResponseAnswerCreateNestedManyWithoutResponseInput
+  followUps?: Prisma.FollowUpCreateNestedManyWithoutResponseInput
 }
 
 export type ResponseUncheckedCreateInput = {
@@ -219,6 +223,7 @@ export type ResponseUncheckedCreateInput = {
   formId: string
   submittedAt?: Date | string
   answers?: Prisma.ResponseAnswerUncheckedCreateNestedManyWithoutResponseInput
+  followUps?: Prisma.FollowUpUncheckedCreateNestedManyWithoutResponseInput
 }
 
 export type ResponseUpdateInput = {
@@ -226,6 +231,7 @@ export type ResponseUpdateInput = {
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   form?: Prisma.FormUpdateOneRequiredWithoutResponsesNestedInput
   answers?: Prisma.ResponseAnswerUpdateManyWithoutResponseNestedInput
+  followUps?: Prisma.FollowUpUpdateManyWithoutResponseNestedInput
 }
 
 export type ResponseUncheckedUpdateInput = {
@@ -233,6 +239,7 @@ export type ResponseUncheckedUpdateInput = {
   formId?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   answers?: Prisma.ResponseAnswerUncheckedUpdateManyWithoutResponseNestedInput
+  followUps?: Prisma.FollowUpUncheckedUpdateManyWithoutResponseNestedInput
 }
 
 export type ResponseCreateManyInput = {
@@ -341,16 +348,32 @@ export type ResponseUpdateOneRequiredWithoutAnswersNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ResponseUpdateToOneWithWhereWithoutAnswersInput, Prisma.ResponseUpdateWithoutAnswersInput>, Prisma.ResponseUncheckedUpdateWithoutAnswersInput>
 }
 
+export type ResponseCreateNestedOneWithoutFollowUpsInput = {
+  create?: Prisma.XOR<Prisma.ResponseCreateWithoutFollowUpsInput, Prisma.ResponseUncheckedCreateWithoutFollowUpsInput>
+  connectOrCreate?: Prisma.ResponseCreateOrConnectWithoutFollowUpsInput
+  connect?: Prisma.ResponseWhereUniqueInput
+}
+
+export type ResponseUpdateOneRequiredWithoutFollowUpsNestedInput = {
+  create?: Prisma.XOR<Prisma.ResponseCreateWithoutFollowUpsInput, Prisma.ResponseUncheckedCreateWithoutFollowUpsInput>
+  connectOrCreate?: Prisma.ResponseCreateOrConnectWithoutFollowUpsInput
+  upsert?: Prisma.ResponseUpsertWithoutFollowUpsInput
+  connect?: Prisma.ResponseWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ResponseUpdateToOneWithWhereWithoutFollowUpsInput, Prisma.ResponseUpdateWithoutFollowUpsInput>, Prisma.ResponseUncheckedUpdateWithoutFollowUpsInput>
+}
+
 export type ResponseCreateWithoutFormInput = {
   id?: string
   submittedAt?: Date | string
   answers?: Prisma.ResponseAnswerCreateNestedManyWithoutResponseInput
+  followUps?: Prisma.FollowUpCreateNestedManyWithoutResponseInput
 }
 
 export type ResponseUncheckedCreateWithoutFormInput = {
   id?: string
   submittedAt?: Date | string
   answers?: Prisma.ResponseAnswerUncheckedCreateNestedManyWithoutResponseInput
+  followUps?: Prisma.FollowUpUncheckedCreateNestedManyWithoutResponseInput
 }
 
 export type ResponseCreateOrConnectWithoutFormInput = {
@@ -392,12 +415,14 @@ export type ResponseCreateWithoutAnswersInput = {
   id?: string
   submittedAt?: Date | string
   form: Prisma.FormCreateNestedOneWithoutResponsesInput
+  followUps?: Prisma.FollowUpCreateNestedManyWithoutResponseInput
 }
 
 export type ResponseUncheckedCreateWithoutAnswersInput = {
   id?: string
   formId: string
   submittedAt?: Date | string
+  followUps?: Prisma.FollowUpUncheckedCreateNestedManyWithoutResponseInput
 }
 
 export type ResponseCreateOrConnectWithoutAnswersInput = {
@@ -420,12 +445,58 @@ export type ResponseUpdateWithoutAnswersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   form?: Prisma.FormUpdateOneRequiredWithoutResponsesNestedInput
+  followUps?: Prisma.FollowUpUpdateManyWithoutResponseNestedInput
 }
 
 export type ResponseUncheckedUpdateWithoutAnswersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   formId?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  followUps?: Prisma.FollowUpUncheckedUpdateManyWithoutResponseNestedInput
+}
+
+export type ResponseCreateWithoutFollowUpsInput = {
+  id?: string
+  submittedAt?: Date | string
+  form: Prisma.FormCreateNestedOneWithoutResponsesInput
+  answers?: Prisma.ResponseAnswerCreateNestedManyWithoutResponseInput
+}
+
+export type ResponseUncheckedCreateWithoutFollowUpsInput = {
+  id?: string
+  formId: string
+  submittedAt?: Date | string
+  answers?: Prisma.ResponseAnswerUncheckedCreateNestedManyWithoutResponseInput
+}
+
+export type ResponseCreateOrConnectWithoutFollowUpsInput = {
+  where: Prisma.ResponseWhereUniqueInput
+  create: Prisma.XOR<Prisma.ResponseCreateWithoutFollowUpsInput, Prisma.ResponseUncheckedCreateWithoutFollowUpsInput>
+}
+
+export type ResponseUpsertWithoutFollowUpsInput = {
+  update: Prisma.XOR<Prisma.ResponseUpdateWithoutFollowUpsInput, Prisma.ResponseUncheckedUpdateWithoutFollowUpsInput>
+  create: Prisma.XOR<Prisma.ResponseCreateWithoutFollowUpsInput, Prisma.ResponseUncheckedCreateWithoutFollowUpsInput>
+  where?: Prisma.ResponseWhereInput
+}
+
+export type ResponseUpdateToOneWithWhereWithoutFollowUpsInput = {
+  where?: Prisma.ResponseWhereInput
+  data: Prisma.XOR<Prisma.ResponseUpdateWithoutFollowUpsInput, Prisma.ResponseUncheckedUpdateWithoutFollowUpsInput>
+}
+
+export type ResponseUpdateWithoutFollowUpsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  form?: Prisma.FormUpdateOneRequiredWithoutResponsesNestedInput
+  answers?: Prisma.ResponseAnswerUpdateManyWithoutResponseNestedInput
+}
+
+export type ResponseUncheckedUpdateWithoutFollowUpsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  formId?: Prisma.StringFieldUpdateOperationsInput | string
+  submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  answers?: Prisma.ResponseAnswerUncheckedUpdateManyWithoutResponseNestedInput
 }
 
 export type ResponseCreateManyFormInput = {
@@ -437,12 +508,14 @@ export type ResponseUpdateWithoutFormInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   answers?: Prisma.ResponseAnswerUpdateManyWithoutResponseNestedInput
+  followUps?: Prisma.FollowUpUpdateManyWithoutResponseNestedInput
 }
 
 export type ResponseUncheckedUpdateWithoutFormInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   submittedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   answers?: Prisma.ResponseAnswerUncheckedUpdateManyWithoutResponseNestedInput
+  followUps?: Prisma.FollowUpUncheckedUpdateManyWithoutResponseNestedInput
 }
 
 export type ResponseUncheckedUpdateManyWithoutFormInput = {
@@ -457,10 +530,12 @@ export type ResponseUncheckedUpdateManyWithoutFormInput = {
 
 export type ResponseCountOutputType = {
   answers: number
+  followUps: number
 }
 
 export type ResponseCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   answers?: boolean | ResponseCountOutputTypeCountAnswersArgs
+  followUps?: boolean | ResponseCountOutputTypeCountFollowUpsArgs
 }
 
 /**
@@ -480,6 +555,13 @@ export type ResponseCountOutputTypeCountAnswersArgs<ExtArgs extends runtime.Type
   where?: Prisma.ResponseAnswerWhereInput
 }
 
+/**
+ * ResponseCountOutputType without action
+ */
+export type ResponseCountOutputTypeCountFollowUpsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.FollowUpWhereInput
+}
+
 
 export type ResponseSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -487,6 +569,7 @@ export type ResponseSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   submittedAt?: boolean
   form?: boolean | Prisma.FormDefaultArgs<ExtArgs>
   answers?: boolean | Prisma.Response$answersArgs<ExtArgs>
+  followUps?: boolean | Prisma.Response$followUpsArgs<ExtArgs>
   _count?: boolean | Prisma.ResponseCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["response"]>
 
@@ -514,6 +597,7 @@ export type ResponseOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs =
 export type ResponseInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   form?: boolean | Prisma.FormDefaultArgs<ExtArgs>
   answers?: boolean | Prisma.Response$answersArgs<ExtArgs>
+  followUps?: boolean | Prisma.Response$followUpsArgs<ExtArgs>
   _count?: boolean | Prisma.ResponseCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ResponseIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -528,6 +612,7 @@ export type $ResponsePayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   objects: {
     form: Prisma.$FormPayload<ExtArgs>
     answers: Prisma.$ResponseAnswerPayload<ExtArgs>[]
+    followUps: Prisma.$FollowUpPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -929,6 +1014,7 @@ export interface Prisma__ResponseClient<T, Null = never, ExtArgs extends runtime
   readonly [Symbol.toStringTag]: "PrismaPromise"
   form<T extends Prisma.FormDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.FormDefaultArgs<ExtArgs>>): Prisma.Prisma__FormClient<runtime.Types.Result.GetResult<Prisma.$FormPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   answers<T extends Prisma.Response$answersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Response$answersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ResponseAnswerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  followUps<T extends Prisma.Response$followUpsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Response$followUpsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FollowUpPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1378,6 +1464,30 @@ export type Response$answersArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   distinct?: Prisma.ResponseAnswerScalarFieldEnum | Prisma.ResponseAnswerScalarFieldEnum[]
+}
+
+/**
+ * Response.followUps
+ */
+export type Response$followUpsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the FollowUp
+   */
+  select?: Prisma.FollowUpSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the FollowUp
+   */
+  omit?: Prisma.FollowUpOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.FollowUpInclude<ExtArgs> | null
+  where?: Prisma.FollowUpWhereInput
+  orderBy?: Prisma.FollowUpOrderByWithRelationInput | Prisma.FollowUpOrderByWithRelationInput[]
+  cursor?: Prisma.FollowUpWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.FollowUpScalarFieldEnum | Prisma.FollowUpScalarFieldEnum[]
 }
 
 /**

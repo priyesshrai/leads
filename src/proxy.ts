@@ -67,11 +67,16 @@ export function proxy(req: NextRequest) {
         }
     }
 
+    if (pathname === '/') {
+        return NextResponse.redirect(new URL("/login", req.url));
+    }
+
     return NextResponse.next();
 }
 
 export const config = {
     matcher: [
+        "/",
         "/admin/:path*",
         "/system_admin/:path*",
         "/superadmin/:path*",
