@@ -16,7 +16,7 @@ interface FormField {
   optionsText: string;
 }
 
-export default function AddNewForm() {
+export default function AddNewForm({ accountId }: { accountId?: string }) {
   const [openFormModal, setOpenFormModal] = useState(false);
   return (
     <div className="relative">
@@ -28,7 +28,7 @@ export default function AddNewForm() {
         <PlusIcon size={14} />
       </button>
 
-      {openFormModal && <OpenForm onClose={setOpenFormModal} />}
+      {openFormModal && <OpenForm onClose={setOpenFormModal} accountId={accountId} />}
       <Toaster />
     </div>
   );
@@ -39,9 +39,12 @@ interface CreateFormPayload {
   description: string;
   fields: FormField[];
 }
+interface Props {
+  onClose: Dispatch<React.SetStateAction<boolean>>;
+  accountId?: string
+}
 
-
-function OpenForm({ onClose }: { onClose: Dispatch<React.SetStateAction<boolean>> }) {
+function OpenForm({ onClose, accountId }: Props) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [fields, setFields] = useState<FormField[]>([]);
@@ -70,7 +73,7 @@ function OpenForm({ onClose }: { onClose: Dispatch<React.SetStateAction<boolean>
 
   const CreateForm = useMutation({
     mutationFn: async (payload: CreateFormPayload) => {
-      const response = await axios.post("/api/v1/form", payload, {
+      const response = await axios.post(`/api/v1/form?account_id=${accountId ?? ''}`, payload, {
         withCredentials: true,
       });
       return response.data;
@@ -80,11 +83,11 @@ function OpenForm({ onClose }: { onClose: Dispatch<React.SetStateAction<boolean>
       const apiErrors = err.response?.data?.errors;
       if (apiErrors) {
         setFieldErrors(apiErrors);
-        showMessage("error", "Please correct the errors in the form.");
+        showMessage("error", `${err?.response?.data?.error}`);
       } else {
-        showMessage("error", "Something went wrong. Try again.");
+        showMessage("error", `${err?.response?.data?.error}`);
       }
-      toast.error('Something went wrong. Try again.', {
+      toast.error(err?.response?.data?.error, {
         duration: 5000
       });
     },

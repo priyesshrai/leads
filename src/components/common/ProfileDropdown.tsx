@@ -10,7 +10,7 @@ import {
 import { AuthUser } from "@/src/types/auth";
 import Link from "next/link";
 
-export default function ProfileDropdown({ user }: { user: AuthUser | null}) {
+export default function ProfileDropdown({ user }: { user: AuthUser | null }) {
     if (!user) {
         return (
             <div className="w-10 h-10 rounded-full bg-gray-200" />
@@ -31,16 +31,6 @@ export default function ProfileDropdown({ user }: { user: AuthUser | null}) {
                     <p className="font-semibold">{user.name}</p>
                     <p className="text-xs text-gray-500">{user.email}</p>
                 </div>
-
-                <DropdownMenuSeparator />
-
-                <DropdownMenuItem asChild>
-                    <Link href="/account">Account</Link>
-                </DropdownMenuItem>
-
-                <DropdownMenuItem asChild>
-                    <Link href="/settings">Settings</Link>
-                </DropdownMenuItem>
 
                 <DropdownMenuSeparator />
 

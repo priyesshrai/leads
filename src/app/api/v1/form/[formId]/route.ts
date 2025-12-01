@@ -59,10 +59,30 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ f
             return NextResponse.json({ error: "Invalid form ID" }, { status: 400 })
         }
 
-        const form = await prisma.form.findFirst({
-            where: { id: formId, userId: user.id },
-        })
-        if (!form) return NextResponse.json({ error: "Form not found" }, { status: 404 })
+        const userAccount = await prisma.user.findUnique({
+            where: { id: user.id },
+            select: { accountId: true, role: true }
+        });
+
+        if (!userAccount?.accountId) {
+            return NextResponse.json({ error: "User account not found" }, { status: 404 });
+        }
+
+        const form = await prisma.form.findUnique({
+            where: { id: formId },
+            select: { id: true, accountId: true }
+        });
+
+        if (!form) {
+            return NextResponse.json({ error: "Form not found" }, { status: 404 });
+        }
+
+        if (user.role === "ADMIN" && form.accountId !== userAccount.accountId) {
+            return NextResponse.json(
+                { error: "You do not have permission to delete this form." },
+                { status: 403 }
+            );
+        }
 
         const answers = await prisma.responseAnswer.findMany({
             where: {
@@ -146,16 +166,35 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ fo
             return NextResponse.json({ error: "Payload too large" }, { status: 413 })
         }
 
+        const userAccount = await prisma.user.findUnique({
+            where: { id: user.id },
+            select: { accountId: true, role: true }
+        });
+
+        if (!userAccount?.accountId) {
+            return NextResponse.json({ error: "User account not found" }, { status: 404 });
+        }
+
         const { formId } = await params
         if (!formId || formId.trim() === "") {
             return NextResponse.json({ error: "Invalid form ID" }, { status: 400 })
         }
 
-        const form = await prisma.form.findFirst({
-            where: { id: formId, userId: user.id },
+        const form = await prisma.form.findUnique({
+            where: { id: formId },
             include: { fields: true },
-        })
-        if (!form) return NextResponse.json({ error: "Form not found" }, { status: 404 })
+        });
+
+        if (!form) {
+            return NextResponse.json({ error: "Form not found" }, { status: 404 });
+        }
+
+        if (user.role === "ADMIN" && form.accountId !== userAccount.accountId) {
+            return NextResponse.json(
+                { error: "You do not have permission to update this form." },
+                { status: 403 }
+            );
+        }
 
         const body = await req.json()
         const parsed = updateFormSchema.safeParse(body)
@@ -223,7 +262,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ fo
                         console.error("Cloudinary delete error:", err);
                     }
                 }
-                
+
                 await tx.responseAnswer.deleteMany({
                     where: { fieldId: { in: toDelete } }
                 });

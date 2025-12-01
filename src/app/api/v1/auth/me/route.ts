@@ -1,45 +1,98 @@
+import { isRateLimited } from "@/src/lib/limiter";
 import prisma from "@/src/lib/prisma";
 import { verifyRole } from "@/src/lib/verifyRole";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
     try {
-        const user = await verifyRole(["SUPERADMIN", "ADMIN"]);
-        if (!user) {
+        const ip = req.headers.get("x-forwarded-for") || "unknown";
+        if (isRateLimited(ip)) {
             return NextResponse.json(
-                { error: "Unauthorized" },
-                { status: 403 }
+                { error: "Too many requests. Try again later." },
+                { status: 429 }
             );
         }
-        const dbUser = await prisma.user.findFirst({
-            where: { email: user.email },
-            select: {
-                id: true,
-                name: true,
-                email: true,
-                account: true,
-                accountId: true,
-            },
+        const user = await verifyRole(["SUPERADMIN", "ADMIN"]);
+        const { searchParams } = new URL(req.url);
+        const queryAccountId = searchParams.get("account_id")?.trim() || "";
+
+        if (queryAccountId !== "") {
+            const validAccount = await prisma.account.findUnique({
+                where: { id: queryAccountId }
+            });
+
+            if (!validAccount) {
+                return NextResponse.json(
+                    { error: "Invalid Account." },
+                    { status: 404 }
+                );
+            }
+        }
+
+        const account = await prisma.user.findUnique({
+            where: { id: user.id },
+            select: { accountId: true }
         });
 
-        if (!dbUser) {
+        if (!account?.accountId && queryAccountId === "") {
             return NextResponse.json(
-                { error: "User not found" },
+                { error: "Account not found." },
                 { status: 404 }
             );
         }
 
-        const initials = generateNameInitials(dbUser.name);
-        const responsePayload = {
-            id: dbUser.id,
-            name: dbUser.name,
-            email: dbUser.email,
-            accountId: dbUser.accountId,
-            account: dbUser.account,
-            initials,
-        };
+        const finalAccountId = queryAccountId !== "" ? queryAccountId : account?.accountId;
 
-        return NextResponse.json(responsePayload, { status: 200 });
+        const user_account = await prisma.account.findUnique({
+            where: { id: finalAccountId },
+            include: {
+                users: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        role: true,
+                    }
+                },
+                forms: {
+                    select: {
+                        id: true,
+                        _count: {
+                            select: {
+                                responses: true
+                            }
+                        }
+                    }
+                },
+                _count: {
+                    select: {
+                        forms: true,
+                        users: true
+                    }
+                }
+            }
+        });
+
+        if (!user_account) {
+            return NextResponse.json(
+                { error: "Account not found." },
+                { status: 404 }
+            );
+        }
+        const totalResponses = user_account.forms.reduce(
+            (sum, f) => sum + f._count.responses, 0
+        );
+
+        const initials = generateNameInitials(user_account.businessName) 
+
+        return NextResponse.json(
+            {
+                data: user_account,
+                initials,
+                total_response:totalResponses,
+            },
+            { status: 200 }
+        );
 
     } catch (err: any) {
         console.error(err.message);
