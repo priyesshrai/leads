@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { isRateLimited } from "@/src/lib/limiter";
 import prisma from "@/src/lib/prisma";
 import { verifyRole } from "@/src/lib/verifyRole";
+import { sendResponseAlertEmail } from "@/src/lib/sendResponseAlertEmail";
 
 export const runtime = "nodejs";
 
@@ -75,7 +76,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
 
         const form = await prisma.form.findFirst({
             where: { id: formId },
-            include: { fields: true },
+            include: { fields: true, account: true },
         });
 
         if (!form) {
@@ -171,10 +172,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
             return response;
         });
 
+        if (form.account?.email) {
+            await sendResponseAlertEmail(form.account.email, form.account.businessName ?? "User", form.title);
+        }
+
         return NextResponse.json(
             { success: true, responseId: result.id },
             { status: 201, headers }
         );
+        
     } catch (err: any) {
         console.error("Submit error:", err);
         return NextResponse.json(
