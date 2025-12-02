@@ -26,12 +26,12 @@ export async function POST(req: NextRequest) {
         }
 
         const parsed = loginSchema.safeParse(body)
-        if (!parsed.success) {             
+        if (!parsed.success) {
             return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 })
         }
 
         const email = parsed.data.email.toLowerCase().trim()
-        
+
         const result = await login(email, body.password)
         if (typeof result === "string") {
             return NextResponse.json({ error: result }, { status: 401 })
@@ -39,13 +39,16 @@ export async function POST(req: NextRequest) {
         const { token, user } = result
 
         const cookieStore = await cookies()
+        const ONE_DAY = 60 * 60 * 24
         cookieStore.set("token", token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             sameSite: "lax",
             path: "/",
-            maxAge: 7 * 24 * 60,
+            maxAge: ONE_DAY,
+            expires: new Date(Date.now() + ONE_DAY * 1000),
         })
+
         return NextResponse.json({
             success: true,
             token: token,
