@@ -171,7 +171,6 @@ export default function UsersData({ formId }: { formId: string }) {
             filterable: true,
             // @ts-ignore
             valueGetter: (value, row) => row?.answers?.[key] ?? "",
-
             renderCell: (params: GridRenderCellParams) => {
                 const v = params.value;
                 if (typeof v === "string" && v.startsWith("http")) {
@@ -207,21 +206,27 @@ export default function UsersData({ formId }: { formId: string }) {
                 field: "leadStatus",
                 headerName: "Status",
                 width: 140,
-                valueGetter: (value, row) => row.leadStatus,
+                sortable: true,
+                renderCell: (params : GridRenderCellParams) => {
+                    const status = params.row.leadStatus;
+                    const color =
+                        status === "COMPLETED"
+                            ? "success"
+                            : status === "CANCELLED"
+                                ? "error"
+                                : "warning";
+
+                    return (
+                        <Chip
+                            label={status}
+                            color={color}
+                            size="small"
+                            sx={{ fontWeight: 600 }}
+                        />
+                    );
+                },
             },
 
-            // {
-            //     field: "follow_up",
-            //     headerName: "Follow UP",
-            //     width: 120,
-            //     sortable: false,
-            //     filterable: false,
-            //     renderCell: (params) => (
-            //         <Button size="small" onClick={() => setOpenResponse(params.row)}>
-            //             View
-            //         </Button>
-            //     ),
-            // },
         ];
     }, [dynamicCols, responses]);
 
@@ -287,8 +292,6 @@ export default function UsersData({ formId }: { formId: string }) {
         });
     };
 
-    console.log(openResponse);
-    
 
     return (
         <div className="w-full">

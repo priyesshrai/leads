@@ -12,7 +12,7 @@ interface FollowUpPayload {
     nextFollowUpDate?: string | null;
     businessStatus: string;
 }
-
+// Create a follow up
 export async function POST(req: NextRequest) {
     try {
         const ip = req.headers.get("x-forwarded-for") || "unknown";
@@ -124,6 +124,76 @@ export async function POST(req: NextRequest) {
         console.error("POST /followup error:", err);
         return NextResponse.json(
             { error: err.message || "Failed to create form" },
+            { status: 500 }
+        );
+    }
+}
+
+// Get the follow of of the current date
+export async function GET(req: NextRequest) {
+    try {
+        const ip = req.headers.get("x-forwarded-for") || "unknown";
+        if (isRateLimited(ip)) {
+            return NextResponse.json(
+                { error: "Too many requests. Try again later." },
+                { status: 429 }
+            );
+        }
+
+        const user = await verifyRole(["ADMIN", "SUPERADMIN"]);
+        if (!user) {
+            return NextResponse.json(
+                { error: "Unauthorized" },
+                { status: 401 }
+            );
+        }
+
+        const now = new Date();
+
+        const startOfDay = new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate(),
+            0, 0, 0, 0
+        );
+
+        const endOfDay = new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate(),
+            23, 59, 59, 999
+        );
+
+        const followUps = await prisma.followUp.findMany({
+            where: {
+                addedByUserId: user.id,
+                nextFollowUpDate: {
+                    gte: startOfDay,
+                    lte: endOfDay,
+                },
+            },
+            include: {
+                response: {
+                    include: {
+                        answers: true,
+                    },
+                },
+                addedBy: {
+                    select: { id: true, name: true, email: true },
+                },
+            },
+            orderBy: { nextFollowUpDate: "asc" },
+        });
+
+        return NextResponse.json(
+            { success: true, today: followUps },
+            { status: 200 }
+        );
+
+    } catch (error: any) {
+        console.error("Fetch Today's FollowUps Error:", error.message);
+        return NextResponse.json(
+            { error: "Internal Server Error" },
             { status: 500 }
         );
     }
