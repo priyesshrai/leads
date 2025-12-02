@@ -1136,6 +1136,7 @@ export const FollowUpScalarFieldEnum = {
   note: 'note',
   type: 'type',
   status: 'status',
+  businessStatus: 'businessStatus',
   nextFollowUpDate: 'nextFollowUpDate',
   createdAt: 'createdAt'
 } as const

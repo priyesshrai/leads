@@ -1,11 +1,16 @@
 "use client";
+
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useMemo, useState, useEffect, JSX } from "react";
 import {
-    Timeline, TimelineItem, TimelineSeparator, TimelineConnector, TimelineContent, TimelineDot
+    Timeline,
+    TimelineItem,
+    TimelineSeparator,
+    TimelineConnector,
+    TimelineContent,
+    TimelineDot,
 } from "@mui/lab";
-
 
 import {
     DataGrid,
@@ -22,39 +27,64 @@ import {
     DialogContent,
     DialogActions,
     Typography,
-    TextField
+    TextField,
+    Alert,
+    Chip,
 } from "@mui/material";
-import { Chip } from "@mui/material";
+
 import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
 import EmailIcon from "@mui/icons-material/Email";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import EventIcon from "@mui/icons-material/Event";
 import NoteIcon from "@mui/icons-material/Note";
+
 import toast from "react-hot-toast";
 import Spinner from "../ui/spinner";
 
-const typeIcons: Record<string, JSX.Element> = {
+const TYPE_ICONS: Record<string, JSX.Element> = {
     CALL: <LocalPhoneIcon fontSize="small" color="primary" />,
     EMAIL: <EmailIcon fontSize="small" color="primary" />,
     WHATSAPP: <WhatsAppIcon fontSize="small" color="success" />,
     MEETING: <EventIcon fontSize="small" color="secondary" />,
     NOTE: <NoteIcon fontSize="small" color="action" />,
 };
-
-const statusChip = (status: string) => {
-    const styles: Record<string, any> = {
-        PENDING: { color: "warning", label: "Pending" },
-        COMPLETED: { color: "success", label: "Completed" },
-        CANCELLED: { color: "error", label: "Cancelled" },
-    };
-
-    const s = styles[status] || styles.PENDING;
-
-    return <Chip label={s.label} color={s.color} size="small" />;
-};
+const CLOSED_BUSINESS_STATUSES = ["Client Converted", "Client not Interested"];
+const BUSINESS_STATUSES = [
+    "Client Converted",
+    "Client will Call",
+    "Client will Visit",
+    "Client will Message",
+    "Call Client",
+    "Message Client",
+    "Visit Client",
+    "Put on Backburner",
+    "Client not Interested",
+];
+const FOLLOWUP_TYPES = [
+    { value: "NOTE", label: "Note" },
+    { value: "CALL", label: "Phone Call" },
+    { value: "EMAIL", label: "Sent Email" },
+    { value: "WHATSAPP", label: "WhatsApp Message" },
+    { value: "MEETING", label: "Meeting" },
+    { value: "STATUS_CHANGE", label: "Status Change" },
+];
 
 export interface FormAnswers {
     [key: string]: string;
+}
+export interface FollowUpItem {
+    id: string;
+    type: string;
+    note: string | null;
+    status: string;
+    businessStatus: string;
+    createdAt: string;
+    nextFollowUpDate: string | null;
+    addedBy?: {
+        id: string;
+        name: string;
+        email: string;
+    };
 }
 export interface FormResponseItem {
     responseId: string;
@@ -80,65 +110,53 @@ export interface FormResponsesData {
     nextPage: number | null;
     prevPage: number | null;
 }
-export interface FollowUpItem {
-    id: string;
-    type: string;
-    note: string | null;
-    status: string;
-    createdAt: string;
-    nextFollowUpDate: string | null;
-    addedBy?: {
-        id: string;
-        name: string;
-        email: string;
-    };
-}
 
 export default function UsersData({ formId }: { formId: string }) {
     const STORAGE_KEY = `form_${formId}_column_visibility`;
     const queryClient = useQueryClient();
     const hasFormId = !!formId;
-    const [followType, setFollowType] = useState("NOTE");
-    const [followNote, setFollowNote] = useState("");
-    const [followNextDate, setFollowNextDate] = useState("");
-    const [followStatus, setFollowStatus] = useState("PENDING");
-
-    const [page] = useState(0);
-    const [pageSize] = useState(20);
-
+    const [followType, setFollowType] = useState<string>("NOTE");
+    const [followNote, setFollowNote] = useState<string>("");
+    const [followNextDate, setFollowNextDate] = useState<string>("");
+    const [followBusinessStatus, setFollowBusinessStatus] = useState<string>("");
     const [columnVisibilityModel, setColumnVisibilityModel] = useState<any>({});
     const [openResponse, setOpenResponse] = useState<FormResponseItem | null>(null);
-    const [paginationModel, setPaginationModel] = useState({
-        pageSize: 20,
-        page: 0,
-    });
+    const [paginationModel, setPaginationModel] = useState({ pageSize: 20, page: 0 });
 
     useEffect(() => {
         if (typeof window === "undefined") return;
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) setColumnVisibilityModel(JSON.parse(saved));
-    }, []);
+    }, [STORAGE_KEY]);
 
     useEffect(() => {
-        if (Object.keys(columnVisibilityModel).length)
+        if (Object.keys(columnVisibilityModel).length) {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(columnVisibilityModel));
-    }, [columnVisibilityModel]);
+        }
+    }, [columnVisibilityModel, STORAGE_KEY]);
+
+    useEffect(() => {
+        if (!openResponse) return;
+        const lastFU = openResponse.followUps?.at(-1) ?? null;
+        setFollowType(lastFU?.type ?? "NOTE");
+        setFollowNote("");
+        setFollowNextDate(lastFU?.nextFollowUpDate ?? "");
+        setFollowBusinessStatus(lastFU?.businessStatus ?? "");
+    }, [openResponse]);
+
 
     const { data, isLoading } = useQuery<FormResponsesData>({
-        queryKey: ["form_responses", formId, page, pageSize],
+        queryKey: ["form_responses", formId, paginationModel.page, paginationModel.pageSize],
         queryFn: async () => {
             const res = await axios.get(`/api/v1/form/${formId}/response`, {
-                params: {
-                    page: paginationModel.page + 1,
-                    limit: paginationModel.pageSize,
-                },
+                params: { page: paginationModel.page + 1, limit: paginationModel.pageSize },
                 withCredentials: true,
             });
             return res.data;
         },
-        enabled: !!formId,
+        enabled: hasFormId,
         retry: 1,
-        placeholderData: (prev) => prev,
+        placeholderData: (old) => old,
     });
     const responses = data?.responses || [];
     const dynamicCols = responses.length ? Object.keys(responses[0].answers) : [];
@@ -207,126 +225,112 @@ export default function UsersData({ formId }: { formId: string }) {
         ];
     }, [dynamicCols, responses]);
 
-    // if (isLoading) return <Spinner />;
     if (!hasFormId) return null;
 
     const addFollowUpMutation = useMutation({
-        mutationFn: async () => {
-            if (!openResponse) return null;
-
-            const payload = {
-                responseId: openResponse.responseId,
-                type: followType,
-                status: followStatus,
-                note: followNote,
-                nextFollowUpDate: followNextDate || null,
-            };
-
-            const res = await axios.post("/api/v1/followup", payload, {
-                withCredentials: true,
-            });
-
+        mutationFn: async (payload: {
+            responseId: string;
+            type: string;
+            note?: string | null;
+            nextFollowUpDate?: string | null;
+            businessStatus: string;
+        }) => {
+            const res = await axios.post("/api/v1/followup", payload, { withCredentials: true });
             return res.data;
         },
-
-        onSuccess: async (_, variables) => {
-            toast.success("Follow Up added")
+        onSuccess: async (_, payload) => {
+            toast.success("Follow-up added");
             await queryClient.invalidateQueries({
                 queryKey: ["form_responses", formId, paginationModel.page, paginationModel.pageSize],
             });
-
             const updated = await axios.get(`/api/v1/form/${formId}/response`, {
-                params: {
-                    page: paginationModel.page + 1,
-                    limit: paginationModel.pageSize,
-                },
+                params: { page: paginationModel.page + 1, limit: paginationModel.pageSize },
+                withCredentials: true,
             });
-
-            const updatedRow: FormResponseItem | undefined =
-                updated.data.responses.find(
-                    (r: FormResponseItem) => r.responseId === openResponse?.responseId
-                );
-
-            if (updatedRow) {
-                setOpenResponse(updatedRow);
-            }
+            const updatedRow: FormResponseItem | undefined = updated.data.responses.find(
+                (r: FormResponseItem) => r.responseId === payload.responseId
+            );
+            if (updatedRow) setOpenResponse(updatedRow);
             setFollowNote("");
             setFollowNextDate("");
             setFollowType("NOTE");
-            setFollowStatus("PENDING");
+            setFollowBusinessStatus("");
         },
-
-        onError: (err: any) => {
-            toast.error("Can't add Follow Up")
-            console.error("Follow-up creation failed:", err);
+        onError: (err: AxiosError) => {
+            console.log(
+                "Follow-up creation failed:",
+                ((err.response?.data as any)?.error) ?? err.message
+            );
+            toast.error(((err.response?.data as any)?.error) ?? err.message);
         },
     });
+
     const handleAddFollowUp = () => {
         if (!openResponse) return;
-        addFollowUpMutation.mutate();
+        if (!followBusinessStatus) {
+            toast.error("Please choose a business status");
+            return;
+        }
+
+        const lastFU = openResponse.followUps.at(-1);
+        if (lastFU && CLOSED_BUSINESS_STATUSES.includes(lastFU.businessStatus)) {
+            toast.error("No further follow-ups allowed for this lead");
+            return;
+        }
+
+        addFollowUpMutation.mutate({
+            responseId: openResponse.responseId,
+            type: followType,
+            note: followNote || null,
+            nextFollowUpDate: followNextDate || null,
+            businessStatus: followBusinessStatus,
+        });
     };
 
+    console.log(openResponse);
+    
 
     return (
         <div className="w-full">
-
             <div className="flex justify-between items-center mb-5">
-                <h1 className="font-bold text-zinc-800 text-xl">
-                    User Data of {data?.title}
-                </h1>
+                <h1 className="font-bold text-zinc-800 text-xl">{data?.title ? `User Data of ${data.title}` : "Responses"}</h1>
             </div>
 
             <DataGrid
-                showToolbar
-                loading={isLoading}
                 rows={responses}
                 columns={columns}
                 getRowId={(row) => row.responseId}
+                loading={isLoading}
                 autoHeight
                 disableRowSelectionOnClick
                 getRowHeight={() => "auto"}
                 columnVisibilityModel={columnVisibilityModel}
                 onColumnVisibilityModelChange={setColumnVisibilityModel}
-                onRowClick={(params) => setOpenResponse(params.row)}
+                onRowClick={(params) => setOpenResponse(params.row as FormResponseItem)}
                 paginationMode="server"
                 rowCount={data?.totalResponse || 0}
                 paginationModel={paginationModel}
                 onPaginationModelChange={(newModel) => setPaginationModel(newModel)}
-                slots={{
-                    toolbar: GridToolbar,
-                }}
-                slotProps={{
-                    toolbar: {
-                        showQuickFilter: true,
-                        quickFilterProps: { debounceMs: 300 },
-                    },
-                }}
+                slots={{ toolbar: GridToolbar }}
+                slotProps={{ toolbar: { showQuickFilter: true, quickFilterProps: { debounceMs: 300 } } }}
                 sx={{
                     backgroundColor: "white",
                     borderRadius: "12px",
                     boxShadow: 3,
-                    "& .MuiDataGrid-cell": {
-                        py: 2,
-                    }
+                    "& .MuiDataGrid-cell": { py: 2 },
                 }}
             />
 
-            <Dialog
-                open={!!openResponse}
-                onClose={() => setOpenResponse(null)}
-                maxWidth="md"
-                fullWidth
-            >
+            <Dialog open={!!openResponse} onClose={() => setOpenResponse(null)} maxWidth="lg" fullWidth>
                 <DialogTitle>View Lead</DialogTitle>
 
                 <DialogContent dividers>
                     {openResponse && (
                         <>
-
                             {Object.entries(openResponse.answers).map(([key, val]) => {
                                 const value = typeof val === "string" ? val : JSON.stringify(val);
                                 return (
-                                    <Box key={key} mb={2}>
+                                    <Box key={key} mb={0}>
                                         <Typography variant="subtitle2" color="text.secondary">
                                             {key}
                                         </Typography>
@@ -335,152 +339,190 @@ export default function UsersData({ formId }: { formId: string }) {
                                 );
                             })}
 
-                            <Box mt={4}>
-                                <Typography variant="h6" gutterBottom>
-                                    Follow-Up Timeline
-                                </Typography>
-
+                            <Box mt={3} display="flex" flexDirection="column" gap={2}>
                                 {openResponse.followUps.length === 0 && (
-                                    <Typography>No follow-ups yet.</Typography>
+                                    <Typography>No activity yet.</Typography>
                                 )}
 
-                                <Timeline sx={{ pl: 0, mt: 2 }}>
-                                    {openResponse.followUps.map((f, index) => (
-                                        <TimelineItem key={f.id} sx={{ minHeight: "95px" }}>
-                                            <TimelineSeparator>
-                                                <TimelineDot
-                                                    sx={{
-                                                        backgroundColor:
+                                {openResponse.followUps.map((f) => {
+                                    const Icon = TYPE_ICONS[f.type] ?? TYPE_ICONS["NOTE"];
+
+                                    return (
+                                        <Box
+                                            key={f.id}
+                                            sx={{
+                                                display: "flex",
+                                                gap: 2,
+                                                p: 2,
+                                                background: "white",
+                                                borderRadius: 2,
+                                                border: "1px solid #eee",
+                                                boxShadow: "0px 4px 8px rgba(0,0,0,0.05)",
+                                                transition: "0.2s",
+                                                "&:hover": { boxShadow: "0px 6px 14px rgba(0,0,0,0.1)" },
+                                            }}
+                                        >
+                                            <Box
+                                                sx={{
+                                                    width: 45,
+                                                    height: 45,
+                                                    borderRadius: "50%",
+                                                    backgroundColor: "#f5f5f5",
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    justifyContent: "center",
+                                                    boxShadow: "inset 0px 0px 5px rgba(0,0,0,0.1)",
+                                                }}
+                                            >
+                                                {Icon}
+                                            </Box>
+
+                                            <Box flex={1}>
+                                                <Box display="flex" justifyContent="space-between" alignItems="center">
+                                                    <Typography fontWeight={600}>
+                                                        {f.addedBy?.name ?? "Someone"}{" "}
+                                                        <span style={{ fontWeight: 400 }}>
+                                                            {f.type === "CALL" && "made a call"}
+                                                            {f.type === "EMAIL" && "sent an email"}
+                                                            {f.type === "WHATSAPP" && "sent a WhatsApp message"}
+                                                            {f.type === "MEETING" && "logged a meeting"}
+                                                            {f.type === "STATUS_CHANGE" && "changed status to"}
+                                                            {f.type === "NOTE" && "added a note"}
+                                                        </span>{" "}
+                                                        {f.type === "STATUS_CHANGE" && (
+                                                            <b>{f.businessStatus}</b>
+                                                        )}
+                                                    </Typography>
+
+                                                    <Chip
+                                                        label={f.status}
+                                                        size="small"
+                                                        color={
                                                             f.status === "COMPLETED"
-                                                                ? "#4caf50"
+                                                                ? "success"
                                                                 : f.status === "CANCELLED"
-                                                                    ? "#f44336"
-                                                                    : "#1976d2",
-                                                    }}
-                                                />
-                                                {index !== openResponse.followUps.length - 1 && (
-                                                    <TimelineConnector sx={{ backgroundColor: "#ccc" }} />
+                                                                    ? "error"
+                                                                    : "primary"
+                                                        }
+                                                    />
+                                                </Box>
+
+                                                {f.note && (
+                                                    <Typography mt={1} variant="body2" >
+                                                        <b>Summary:</b> {f.note}
+                                                    </Typography>
                                                 )}
-                                            </TimelineSeparator>
 
-                                            <TimelineContent sx={{ pb: 4, ml: 1 }}>
-                                                <Box
-                                                    sx={{
-                                                        p: 2,
-                                                        backgroundColor: "white",
-                                                        borderRadius: 2,
-                                                        border: "1px solid #e0e0e0",
-                                                        width: "100%",
-                                                        boxShadow: 1,
-                                                    }}
-                                                >
-                                                    <Box display="flex" justifyContent="space-between" alignItems="center">
-                                                        <Box display="flex" alignItems="center" gap={1}>
-                                                            {typeIcons[f.type] || typeIcons["NOTE"]}
-                                                            <Typography fontWeight="bold">{f.type}</Typography>
-                                                        </Box>
-
-                                                        {statusChip(f.status)}
-                                                    </Box>
-
-                                                    <Typography mt={1}>
-                                                        <b>Note:</b> {f.note || "-"}
-                                                    </Typography>
-
-                                                    <Typography>
-                                                        <b>By:</b> {f.addedBy?.name}
-                                                    </Typography>
-
-                                                    <Typography>
-                                                        <b>Date:</b>{" "}
-                                                        {new Date(f.createdAt).toLocaleString()}
+                                                {/* Extra Details */}
+                                                <Box mt={1} display="flex" flexDirection="column" gap={0.5}>
+                                                    <Typography variant="body2">
+                                                        <b>Date:</b> {new Date(f.createdAt).toLocaleString()}
                                                     </Typography>
 
                                                     {f.nextFollowUpDate && (
-                                                        <Typography>
+                                                        <Typography variant="body2">
                                                             <b>Next Follow-Up:</b>{" "}
                                                             {new Date(f.nextFollowUpDate).toLocaleDateString()}
                                                         </Typography>
                                                     )}
+
+                                                    <Typography variant="body2">
+                                                        <b>Status set to:</b> {f.businessStatus}
+                                                    </Typography>
                                                 </Box>
-                                            </TimelineContent>
-                                        </TimelineItem>
-                                    ))}
-                                </Timeline>
+                                            </Box>
+                                        </Box>
+                                    );
+                                })}
                             </Box>
 
-                            <Box
-                                mt={4}
-                                p={3}
-                                sx={{
-                                    border: "1px solid #ddd",
-                                    borderRadius: 2,
-                                    background: "#fafafa",
-                                }}
-                            >
-                                <Typography variant="h6" gutterBottom>
-                                    Add New Follow-Up
-                                </Typography>
+                            {
+                                openResponse && openResponse.leadStatus !== "COMPLETED" && openResponse.leadStatus !== "CANCELLED" && (
+                                    <Box mt={4} p={3} sx={{ border: "1px solid #ddd", borderRadius: 2, background: "#fafafa" }}>
+                                        <Typography variant="h6" gutterBottom>
+                                            Add New Follow-Up
+                                        </Typography>
 
-                                <Box display="flex" flexDirection="column" gap={2}>
-                                    <TextField
-                                        label="Follow-Up Type"
-                                        select
-                                        value={followType}
-                                        onChange={(e) => setFollowType(e.target.value)}
-                                        SelectProps={{ native: true }}
-                                        fullWidth
-                                    >
-                                        <option value="NOTE">Note</option>
-                                        <option value="CALL">Call</option>
-                                        <option value="EMAIL">Email</option>
-                                        <option value="WHATSAPP">WhatsApp</option>
-                                        <option value="MEETING">Meeting</option>
-                                        <option value="STATUS_CHANGE">Status Change</option>
-                                    </TextField>
+                                        {(() => {
+                                            const lastFU = openResponse.followUps.at(-1);
+                                            if (lastFU && CLOSED_BUSINESS_STATUSES.includes(lastFU.businessStatus)) {
+                                                return <Alert severity="info">This lead is marked as <b>{lastFU.businessStatus}</b>. No further follow-ups can be added.</Alert>;
+                                            }
 
-                                    <TextField
-                                        label="Status"
-                                        select
-                                        value={followStatus}
-                                        onChange={(e) => setFollowStatus(e.target.value)}
-                                        SelectProps={{ native: true }}
-                                        fullWidth
-                                    >
-                                        <option value="PENDING">Pending</option>
-                                        <option value="COMPLETED">Completed</option>
-                                        <option value="CANCELLED">Cancelled</option>
-                                    </TextField>
+                                            return (
+                                                <Box display="flex" flexDirection="column" gap={2}>
+                                                    <TextField
+                                                        label="Follow-Up Type"
+                                                        select
+                                                        value={followType}
+                                                        onChange={(e) => setFollowType(e.target.value)}
+                                                        SelectProps={{ native: true }}
+                                                        fullWidth
+                                                    >
+                                                        {FOLLOWUP_TYPES.map((t) => (
+                                                            <option key={t.value} value={t.value}>
+                                                                {t.label}
+                                                            </option>
+                                                        ))}
+                                                    </TextField>
 
-                                    <TextField
-                                        label="Note"
-                                        multiline
-                                        rows={3}
-                                        value={followNote}
-                                        onChange={(e) => setFollowNote(e.target.value)}
-                                        placeholder="Write note..."
-                                        fullWidth
-                                    />
+                                                    <TextField
+                                                        // label="Lead Status"
+                                                        select
+                                                        value={followBusinessStatus}
+                                                        onChange={(e) => {
+                                                            setFollowBusinessStatus(e.target.value);
+                                                            if (CLOSED_BUSINESS_STATUSES.includes(e.target.value)) {
+                                                                setFollowNextDate("");
+                                                            }
+                                                        }}
+                                                        SelectProps={{ native: true }}
+                                                        fullWidth
+                                                    >
+                                                        <option value="">Select status</option>
+                                                        {BUSINESS_STATUSES.map((s) => (
+                                                            <option key={s} value={s}>
+                                                                {s}
+                                                            </option>
+                                                        ))}
+                                                    </TextField>
 
-                                    <TextField
-                                        label="Next Follow-Up Date"
-                                        type="date"
-                                        value={followNextDate}
-                                        onChange={(e) => setFollowNextDate(e.target.value)}
-                                        InputLabelProps={{ shrink: true }}
-                                        fullWidth
-                                    />
+                                                    <TextField
+                                                        label="Note"
+                                                        multiline
+                                                        rows={3}
+                                                        value={followNote}
+                                                        onChange={(e) => setFollowNote(e.target.value)}
+                                                        placeholder="Write note..."
+                                                        fullWidth
+                                                    />
 
-                                    <Button
-                                        variant="contained"
-                                        size="large"
-                                        onClick={handleAddFollowUp}
-                                        sx={{ mt: 1 }}
-                                    >
-                                        {addFollowUpMutation.isPending ? <Spinner color="white"/> : "Add Follow-Up" }
-                                    </Button>
-                                </Box>
-                            </Box>
+                                                    {followBusinessStatus && !CLOSED_BUSINESS_STATUSES.includes(followBusinessStatus) && (
+                                                        <TextField
+                                                            label="Next Follow-Up Date"
+                                                            type="date"
+                                                            value={followNextDate}
+                                                            onChange={(e) => setFollowNextDate(e.target.value)}
+                                                            InputLabelProps={{ shrink: true }}
+                                                            fullWidth
+                                                        />
+                                                    )}
+
+                                                    <Button
+                                                        variant="contained"
+                                                        size="large"
+                                                        onClick={handleAddFollowUp}
+                                                        sx={{ mt: 1 }}
+                                                        disabled={addFollowUpMutation.isPending || !followBusinessStatus}
+                                                    >
+                                                        {addFollowUpMutation.isPending ? <Spinner color="white" /> : "Add Follow-Up"}
+                                                    </Button>
+                                                </Box>
+                                            );
+                                        })()}
+                                    </Box>
+                                )
+                            }
                         </>
                     )}
                 </DialogContent>

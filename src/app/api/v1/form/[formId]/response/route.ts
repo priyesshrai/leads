@@ -222,7 +222,13 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
                         followUps: {
                             orderBy: { createdAt: "desc" },
                             include: {
-                                addedBy: true,
+                                addedBy: {
+                                    select: {
+                                        id: true,
+                                        name: true,
+                                        email: true,
+                                    }
+                                },
                             }
                         },
                     },

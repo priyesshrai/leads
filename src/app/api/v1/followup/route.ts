@@ -10,12 +10,11 @@ interface FollowUpPayload {
     type: string;
     note?: string | null;
     nextFollowUpDate?: string | null;
-    status?: string;
+    businessStatus: string;
 }
 
 export async function POST(req: NextRequest) {
     try {
-
         const ip = req.headers.get("x-forwarded-for") || "unknown";
         if (isRateLimited(ip)) {
             return NextResponse.json(
@@ -26,60 +25,79 @@ export async function POST(req: NextRequest) {
 
         const user = await verifyRole(["ADMIN", "SUPERADMIN"]);
         if (!user) {
-            return NextResponse.json(
-                { error: "Unauthorized" },
-                { status: 401 }
-            );
-        }
-
-        const contentLength = Number(req.headers.get("content-length") || 0);
-        if (contentLength > 50_000) {
-            return NextResponse.json(
-                { error: "Payload too large" },
-                { status: 413 }
-            );
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
         const body = (await req.json()) as FollowUpPayload;
 
         if (!body.responseId) {
-            return NextResponse.json(
-                { error: "responseId is required" },
-                { status: 400 }
-            );
+            return NextResponse.json({ error: "responseId is required" }, { status: 400 });
         }
 
-        if (!body.type) {
-            return NextResponse.json(
-                { error: "type is required" },
-                { status: 400 }
-            );
+        if (!body.businessStatus) {
+            return NextResponse.json({ error: "businessStatus is required" }, { status: 400 });
+        }
+
+        const validBusinessStatuses = [
+            "Client Converted",
+            "Client will Call",
+            "Client will Visit",
+            "Client will Message",
+            "Call Client",
+            "Message Client",
+            "Visit Client",
+            "Put on Backburner",
+            "Client not Interested",
+        ];
+
+        if (!validBusinessStatuses.includes(body.businessStatus)) {
+            return NextResponse.json({ error: "Invalid business status" }, { status: 400 });
         }
 
         const parentResponse = await prisma.response.findUnique({
             where: { id: body.responseId },
+            include: {
+                followUps: {
+                    orderBy: { createdAt: "desc" },
+                    take: 1,
+                }
+            }
         });
 
         if (!parentResponse) {
+            return NextResponse.json({ error: "Lead response not found" }, { status: 404 });
+        }
+        const lastFollowUp = parentResponse.followUps[0];
+        const closedStatuses = ["Client Converted", "Client not Interested"];
+        if (lastFollowUp && closedStatuses.includes(lastFollowUp.businessStatus)) {
             return NextResponse.json(
-                { error: "Lead response not found" },
-                { status: 404 }
+                {
+                    error:
+                        `This lead is already marked as "${lastFollowUp.businessStatus}". ` +
+                        `No further follow-ups can be added.`,
+                },
+                { status: 400 }
             );
+        }
+        let internalStatus: FollowUpStatus = FollowUpStatus.PENDING;
+
+        switch (body.businessStatus) {
+            case "Client Converted":
+                internalStatus = FollowUpStatus.COMPLETED;
+                break;
+            case "Client not Interested":
+                internalStatus = FollowUpStatus.CANCELLED;
+                break;
+            case "Put on Backburner":
+                internalStatus = FollowUpStatus.SKIPPED;
+                break;
+            default:
+                internalStatus = FollowUpStatus.PENDING;
         }
 
         const nextDate = body.nextFollowUpDate
             ? new Date(body.nextFollowUpDate)
             : null;
-
-        const status = body.status ?? "PENDING";
-
-        const validStatuses = ["PENDING", "COMPLETED", "CANCELLED", "SKIPPED"];
-        if (!validStatuses.includes(status)) {
-            return NextResponse.json(
-                { error: "Invalid status value" },
-                { status: 400 }
-            );
-        }
 
         const followup = await prisma.followUp.create({
             data: {
@@ -88,7 +106,8 @@ export async function POST(req: NextRequest) {
                 type: body.type as FollowUpType,
                 note: body.note ?? null,
                 nextFollowUpDate: nextDate,
-                status: status as FollowUpStatus,
+                businessStatus: body.businessStatus,
+                status: internalStatus,
             },
             include: {
                 addedBy: {
@@ -101,12 +120,10 @@ export async function POST(req: NextRequest) {
             { success: true, followup },
             { status: 201 }
         );
-
-    } catch (error: any) {
-        console.error("Follow-Up Create Error:", error.message);
-
+    } catch (err: any) {
+        console.error("POST /followup error:", err);
         return NextResponse.json(
-            { error: "Internal Server Error" },
+            { error: err.message || "Failed to create form" },
             { status: 500 }
         );
     }

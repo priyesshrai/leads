@@ -126,9 +126,9 @@ model FollowUp {
   note             String?
   type             FollowUpType   @default(NOTE)
   status           FollowUpStatus @default(PENDING)
+  businessStatus   String         @default("Client will call")
   nextFollowUpDate DateTime?
   createdAt        DateTime       @default(now())
-
-  response Response @relation(fields: [responseId], references: [id], onDelete: Cascade)
-  addedBy  User     @relation(fields: [addedByUserId], references: [id], onDelete: Cascade)
+  response         Response       @relation(fields: [responseId], references: [id], onDelete: Cascade)
+  addedBy          User           @relation(fields: [addedByUserId], references: [id], onDelete: Cascade)
 }

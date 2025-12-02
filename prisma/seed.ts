@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 
 async function main() {
   const superAdminEmail = "super@admin.com";
-  const superAdminPassword = "SuperAdmin@123";
+  const superAdminPassword = "Priyesshrai1@";
 
   const existing = await prisma.user.findUnique({
     where: { email: superAdminEmail }
