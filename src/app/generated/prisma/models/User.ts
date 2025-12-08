@@ -8,7 +8,7 @@
  *
  * 🟢 You can import this file directly.
  */
-import type * as runtime from "@prisma/client/runtime/library"
+import type * as runtime from "@prisma/client/runtime/client"
 import type * as $Enums from "../enums"
 import type * as Prisma from "../internal/prismaNamespace"
 
@@ -227,6 +227,7 @@ export type UserWhereInput = {
   account?: Prisma.XOR<Prisma.AccountScalarRelationFilter, Prisma.AccountWhereInput>
   managedUsers?: Prisma.ManagedUserListRelationFilter
   forms?: Prisma.FormListRelationFilter
+  followUps?: Prisma.FollowUpListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -245,6 +246,7 @@ export type UserOrderByWithRelationInput = {
   account?: Prisma.AccountOrderByWithRelationInput
   managedUsers?: Prisma.ManagedUserOrderByRelationAggregateInput
   forms?: Prisma.FormOrderByRelationAggregateInput
+  followUps?: Prisma.FollowUpOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -266,6 +268,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   account?: Prisma.XOR<Prisma.AccountScalarRelationFilter, Prisma.AccountWhereInput>
   managedUsers?: Prisma.ManagedUserListRelationFilter
   forms?: Prisma.FormListRelationFilter
+  followUps?: Prisma.FollowUpListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -314,6 +317,7 @@ export type UserCreateInput = {
   account: Prisma.AccountCreateNestedOneWithoutUsersInput
   managedUsers?: Prisma.ManagedUserCreateNestedManyWithoutAdminInput
   forms?: Prisma.FormCreateNestedManyWithoutUserInput
+  followUps?: Prisma.FollowUpCreateNestedManyWithoutAddedByInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -330,6 +334,7 @@ export type UserUncheckedCreateInput = {
   createdAdmins?: Prisma.UserUncheckedCreateNestedManyWithoutCreatedByInput
   managedUsers?: Prisma.ManagedUserUncheckedCreateNestedManyWithoutAdminInput
   forms?: Prisma.FormUncheckedCreateNestedManyWithoutUserInput
+  followUps?: Prisma.FollowUpUncheckedCreateNestedManyWithoutAddedByInput
 }
 
 export type UserUpdateInput = {
@@ -346,6 +351,7 @@ export type UserUpdateInput = {
   account?: Prisma.AccountUpdateOneRequiredWithoutUsersNestedInput
   managedUsers?: Prisma.ManagedUserUpdateManyWithoutAdminNestedInput
   forms?: Prisma.FormUpdateManyWithoutUserNestedInput
+  followUps?: Prisma.FollowUpUpdateManyWithoutAddedByNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -362,6 +368,7 @@ export type UserUncheckedUpdateInput = {
   createdAdmins?: Prisma.UserUncheckedUpdateManyWithoutCreatedByNestedInput
   managedUsers?: Prisma.ManagedUserUncheckedUpdateManyWithoutAdminNestedInput
   forms?: Prisma.FormUncheckedUpdateManyWithoutUserNestedInput
+  followUps?: Prisma.FollowUpUncheckedUpdateManyWithoutAddedByNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -596,6 +603,20 @@ export type UserUpdateOneRequiredWithoutFormsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutFormsInput, Prisma.UserUpdateWithoutFormsInput>, Prisma.UserUncheckedUpdateWithoutFormsInput>
 }
 
+export type UserCreateNestedOneWithoutFollowUpsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutFollowUpsInput, Prisma.UserUncheckedCreateWithoutFollowUpsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutFollowUpsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutFollowUpsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutFollowUpsInput, Prisma.UserUncheckedCreateWithoutFollowUpsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutFollowUpsInput
+  upsert?: Prisma.UserUpsertWithoutFollowUpsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutFollowUpsInput, Prisma.UserUpdateWithoutFollowUpsInput>, Prisma.UserUncheckedUpdateWithoutFollowUpsInput>
+}
+
 export type UserCreateWithoutAccountInput = {
   id?: string
   name: string
@@ -609,6 +630,7 @@ export type UserCreateWithoutAccountInput = {
   createdAdmins?: Prisma.UserCreateNestedManyWithoutCreatedByInput
   managedUsers?: Prisma.ManagedUserCreateNestedManyWithoutAdminInput
   forms?: Prisma.FormCreateNestedManyWithoutUserInput
+  followUps?: Prisma.FollowUpCreateNestedManyWithoutAddedByInput
 }
 
 export type UserUncheckedCreateWithoutAccountInput = {
@@ -624,6 +646,7 @@ export type UserUncheckedCreateWithoutAccountInput = {
   createdAdmins?: Prisma.UserUncheckedCreateNestedManyWithoutCreatedByInput
   managedUsers?: Prisma.ManagedUserUncheckedCreateNestedManyWithoutAdminInput
   forms?: Prisma.FormUncheckedCreateNestedManyWithoutUserInput
+  followUps?: Prisma.FollowUpUncheckedCreateNestedManyWithoutAddedByInput
 }
 
 export type UserCreateOrConnectWithoutAccountInput = {
@@ -681,6 +704,7 @@ export type UserCreateWithoutCreatedAdminsInput = {
   account: Prisma.AccountCreateNestedOneWithoutUsersInput
   managedUsers?: Prisma.ManagedUserCreateNestedManyWithoutAdminInput
   forms?: Prisma.FormCreateNestedManyWithoutUserInput
+  followUps?: Prisma.FollowUpCreateNestedManyWithoutAddedByInput
 }
 
 export type UserUncheckedCreateWithoutCreatedAdminsInput = {
@@ -696,6 +720,7 @@ export type UserUncheckedCreateWithoutCreatedAdminsInput = {
   createdAt?: Date | string
   managedUsers?: Prisma.ManagedUserUncheckedCreateNestedManyWithoutAdminInput
   forms?: Prisma.FormUncheckedCreateNestedManyWithoutUserInput
+  followUps?: Prisma.FollowUpUncheckedCreateNestedManyWithoutAddedByInput
 }
 
 export type UserCreateOrConnectWithoutCreatedAdminsInput = {
@@ -716,6 +741,7 @@ export type UserCreateWithoutCreatedByInput = {
   account: Prisma.AccountCreateNestedOneWithoutUsersInput
   managedUsers?: Prisma.ManagedUserCreateNestedManyWithoutAdminInput
   forms?: Prisma.FormCreateNestedManyWithoutUserInput
+  followUps?: Prisma.FollowUpCreateNestedManyWithoutAddedByInput
 }
 
 export type UserUncheckedCreateWithoutCreatedByInput = {
@@ -731,6 +757,7 @@ export type UserUncheckedCreateWithoutCreatedByInput = {
   createdAdmins?: Prisma.UserUncheckedCreateNestedManyWithoutCreatedByInput
   managedUsers?: Prisma.ManagedUserUncheckedCreateNestedManyWithoutAdminInput
   forms?: Prisma.FormUncheckedCreateNestedManyWithoutUserInput
+  followUps?: Prisma.FollowUpUncheckedCreateNestedManyWithoutAddedByInput
 }
 
 export type UserCreateOrConnectWithoutCreatedByInput = {
@@ -767,6 +794,7 @@ export type UserUpdateWithoutCreatedAdminsInput = {
   account?: Prisma.AccountUpdateOneRequiredWithoutUsersNestedInput
   managedUsers?: Prisma.ManagedUserUpdateManyWithoutAdminNestedInput
   forms?: Prisma.FormUpdateManyWithoutUserNestedInput
+  followUps?: Prisma.FollowUpUpdateManyWithoutAddedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedAdminsInput = {
@@ -782,6 +810,7 @@ export type UserUncheckedUpdateWithoutCreatedAdminsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   managedUsers?: Prisma.ManagedUserUncheckedUpdateManyWithoutAdminNestedInput
   forms?: Prisma.FormUncheckedUpdateManyWithoutUserNestedInput
+  followUps?: Prisma.FollowUpUncheckedUpdateManyWithoutAddedByNestedInput
 }
 
 export type UserUpsertWithWhereUniqueWithoutCreatedByInput = {
@@ -813,6 +842,7 @@ export type UserCreateWithoutManagedUsersInput = {
   createdAdmins?: Prisma.UserCreateNestedManyWithoutCreatedByInput
   account: Prisma.AccountCreateNestedOneWithoutUsersInput
   forms?: Prisma.FormCreateNestedManyWithoutUserInput
+  followUps?: Prisma.FollowUpCreateNestedManyWithoutAddedByInput
 }
 
 export type UserUncheckedCreateWithoutManagedUsersInput = {
@@ -828,6 +858,7 @@ export type UserUncheckedCreateWithoutManagedUsersInput = {
   createdAt?: Date | string
   createdAdmins?: Prisma.UserUncheckedCreateNestedManyWithoutCreatedByInput
   forms?: Prisma.FormUncheckedCreateNestedManyWithoutUserInput
+  followUps?: Prisma.FollowUpUncheckedCreateNestedManyWithoutAddedByInput
 }
 
 export type UserCreateOrConnectWithoutManagedUsersInput = {
@@ -859,6 +890,7 @@ export type UserUpdateWithoutManagedUsersInput = {
   createdAdmins?: Prisma.UserUpdateManyWithoutCreatedByNestedInput
   account?: Prisma.AccountUpdateOneRequiredWithoutUsersNestedInput
   forms?: Prisma.FormUpdateManyWithoutUserNestedInput
+  followUps?: Prisma.FollowUpUpdateManyWithoutAddedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutManagedUsersInput = {
@@ -874,6 +906,7 @@ export type UserUncheckedUpdateWithoutManagedUsersInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAdmins?: Prisma.UserUncheckedUpdateManyWithoutCreatedByNestedInput
   forms?: Prisma.FormUncheckedUpdateManyWithoutUserNestedInput
+  followUps?: Prisma.FollowUpUncheckedUpdateManyWithoutAddedByNestedInput
 }
 
 export type UserCreateWithoutFormsInput = {
@@ -889,6 +922,7 @@ export type UserCreateWithoutFormsInput = {
   createdAdmins?: Prisma.UserCreateNestedManyWithoutCreatedByInput
   account: Prisma.AccountCreateNestedOneWithoutUsersInput
   managedUsers?: Prisma.ManagedUserCreateNestedManyWithoutAdminInput
+  followUps?: Prisma.FollowUpCreateNestedManyWithoutAddedByInput
 }
 
 export type UserUncheckedCreateWithoutFormsInput = {
@@ -904,6 +938,7 @@ export type UserUncheckedCreateWithoutFormsInput = {
   createdAt?: Date | string
   createdAdmins?: Prisma.UserUncheckedCreateNestedManyWithoutCreatedByInput
   managedUsers?: Prisma.ManagedUserUncheckedCreateNestedManyWithoutAdminInput
+  followUps?: Prisma.FollowUpUncheckedCreateNestedManyWithoutAddedByInput
 }
 
 export type UserCreateOrConnectWithoutFormsInput = {
@@ -935,6 +970,7 @@ export type UserUpdateWithoutFormsInput = {
   createdAdmins?: Prisma.UserUpdateManyWithoutCreatedByNestedInput
   account?: Prisma.AccountUpdateOneRequiredWithoutUsersNestedInput
   managedUsers?: Prisma.ManagedUserUpdateManyWithoutAdminNestedInput
+  followUps?: Prisma.FollowUpUpdateManyWithoutAddedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutFormsInput = {
@@ -950,6 +986,87 @@ export type UserUncheckedUpdateWithoutFormsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAdmins?: Prisma.UserUncheckedUpdateManyWithoutCreatedByNestedInput
   managedUsers?: Prisma.ManagedUserUncheckedUpdateManyWithoutAdminNestedInput
+  followUps?: Prisma.FollowUpUncheckedUpdateManyWithoutAddedByNestedInput
+}
+
+export type UserCreateWithoutFollowUpsInput = {
+  id?: string
+  name: string
+  email: string
+  password: string
+  role?: $Enums.Role
+  resetToken?: string | null
+  resetTokenExpiresAt?: Date | string | null
+  createdAt?: Date | string
+  createdBy?: Prisma.UserCreateNestedOneWithoutCreatedAdminsInput
+  createdAdmins?: Prisma.UserCreateNestedManyWithoutCreatedByInput
+  account: Prisma.AccountCreateNestedOneWithoutUsersInput
+  managedUsers?: Prisma.ManagedUserCreateNestedManyWithoutAdminInput
+  forms?: Prisma.FormCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutFollowUpsInput = {
+  id?: string
+  name: string
+  email: string
+  password: string
+  role?: $Enums.Role
+  createdById?: string | null
+  accountId: string
+  resetToken?: string | null
+  resetTokenExpiresAt?: Date | string | null
+  createdAt?: Date | string
+  createdAdmins?: Prisma.UserUncheckedCreateNestedManyWithoutCreatedByInput
+  managedUsers?: Prisma.ManagedUserUncheckedCreateNestedManyWithoutAdminInput
+  forms?: Prisma.FormUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutFollowUpsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutFollowUpsInput, Prisma.UserUncheckedCreateWithoutFollowUpsInput>
+}
+
+export type UserUpsertWithoutFollowUpsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutFollowUpsInput, Prisma.UserUncheckedUpdateWithoutFollowUpsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutFollowUpsInput, Prisma.UserUncheckedCreateWithoutFollowUpsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutFollowUpsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutFollowUpsInput, Prisma.UserUncheckedUpdateWithoutFollowUpsInput>
+}
+
+export type UserUpdateWithoutFollowUpsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  resetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdBy?: Prisma.UserUpdateOneWithoutCreatedAdminsNestedInput
+  createdAdmins?: Prisma.UserUpdateManyWithoutCreatedByNestedInput
+  account?: Prisma.AccountUpdateOneRequiredWithoutUsersNestedInput
+  managedUsers?: Prisma.ManagedUserUpdateManyWithoutAdminNestedInput
+  forms?: Prisma.FormUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutFollowUpsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
+  createdById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accountId?: Prisma.StringFieldUpdateOperationsInput | string
+  resetToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  resetTokenExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAdmins?: Prisma.UserUncheckedUpdateManyWithoutCreatedByNestedInput
+  managedUsers?: Prisma.ManagedUserUncheckedUpdateManyWithoutAdminNestedInput
+  forms?: Prisma.FormUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyAccountInput = {
@@ -977,6 +1094,7 @@ export type UserUpdateWithoutAccountInput = {
   createdAdmins?: Prisma.UserUpdateManyWithoutCreatedByNestedInput
   managedUsers?: Prisma.ManagedUserUpdateManyWithoutAdminNestedInput
   forms?: Prisma.FormUpdateManyWithoutUserNestedInput
+  followUps?: Prisma.FollowUpUpdateManyWithoutAddedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAccountInput = {
@@ -992,6 +1110,7 @@ export type UserUncheckedUpdateWithoutAccountInput = {
   createdAdmins?: Prisma.UserUncheckedUpdateManyWithoutCreatedByNestedInput
   managedUsers?: Prisma.ManagedUserUncheckedUpdateManyWithoutAdminNestedInput
   forms?: Prisma.FormUncheckedUpdateManyWithoutUserNestedInput
+  followUps?: Prisma.FollowUpUncheckedUpdateManyWithoutAddedByNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutAccountInput = {
@@ -1031,6 +1150,7 @@ export type UserUpdateWithoutCreatedByInput = {
   account?: Prisma.AccountUpdateOneRequiredWithoutUsersNestedInput
   managedUsers?: Prisma.ManagedUserUpdateManyWithoutAdminNestedInput
   forms?: Prisma.FormUpdateManyWithoutUserNestedInput
+  followUps?: Prisma.FollowUpUpdateManyWithoutAddedByNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedByInput = {
@@ -1046,6 +1166,7 @@ export type UserUncheckedUpdateWithoutCreatedByInput = {
   createdAdmins?: Prisma.UserUncheckedUpdateManyWithoutCreatedByNestedInput
   managedUsers?: Prisma.ManagedUserUncheckedUpdateManyWithoutAdminNestedInput
   forms?: Prisma.FormUncheckedUpdateManyWithoutUserNestedInput
+  followUps?: Prisma.FollowUpUncheckedUpdateManyWithoutAddedByNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutCreatedByInput = {
@@ -1069,12 +1190,14 @@ export type UserCountOutputType = {
   createdAdmins: number
   managedUsers: number
   forms: number
+  followUps: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   createdAdmins?: boolean | UserCountOutputTypeCountCreatedAdminsArgs
   managedUsers?: boolean | UserCountOutputTypeCountManagedUsersArgs
   forms?: boolean | UserCountOutputTypeCountFormsArgs
+  followUps?: boolean | UserCountOutputTypeCountFollowUpsArgs
 }
 
 /**
@@ -1108,6 +1231,13 @@ export type UserCountOutputTypeCountFormsArgs<ExtArgs extends runtime.Types.Exte
   where?: Prisma.FormWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountFollowUpsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.FollowUpWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1125,6 +1255,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
   managedUsers?: boolean | Prisma.User$managedUsersArgs<ExtArgs>
   forms?: boolean | Prisma.User$formsArgs<ExtArgs>
+  followUps?: boolean | Prisma.User$followUpsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1178,6 +1309,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   account?: boolean | Prisma.AccountDefaultArgs<ExtArgs>
   managedUsers?: boolean | Prisma.User$managedUsersArgs<ExtArgs>
   forms?: boolean | Prisma.User$formsArgs<ExtArgs>
+  followUps?: boolean | Prisma.User$followUpsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1197,6 +1329,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     account: Prisma.$AccountPayload<ExtArgs>
     managedUsers: Prisma.$ManagedUserPayload<ExtArgs>[]
     forms: Prisma.$FormPayload<ExtArgs>[]
+    followUps: Prisma.$FollowUpPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1608,6 +1741,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   account<T extends Prisma.AccountDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AccountDefaultArgs<ExtArgs>>): Prisma.Prisma__AccountClient<runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   managedUsers<T extends Prisma.User$managedUsersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$managedUsersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ManagedUserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   forms<T extends Prisma.User$formsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$formsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FormPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  followUps<T extends Prisma.User$followUpsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$followUpsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FollowUpPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2131,6 +2265,30 @@ export type User$formsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
   take?: number
   skip?: number
   distinct?: Prisma.FormScalarFieldEnum | Prisma.FormScalarFieldEnum[]
+}
+
+/**
+ * User.followUps
+ */
+export type User$followUpsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the FollowUp
+   */
+  select?: Prisma.FollowUpSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the FollowUp
+   */
+  omit?: Prisma.FollowUpOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.FollowUpInclude<ExtArgs> | null
+  where?: Prisma.FollowUpWhereInput
+  orderBy?: Prisma.FollowUpOrderByWithRelationInput | Prisma.FollowUpOrderByWithRelationInput[]
+  cursor?: Prisma.FollowUpWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.FollowUpScalarFieldEnum | Prisma.FollowUpScalarFieldEnum[]
 }
 
 /**

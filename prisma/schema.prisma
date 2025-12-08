@@ -12,6 +12,22 @@ enum Role {
   ADMIN
 }
 
+enum FollowUpType {
+  CALL
+  EMAIL
+  WHATSAPP
+  MEETING
+  NOTE
+  STATUS_CHANGE
+}
+
+enum FollowUpStatus {
+  PENDING
+  COMPLETED
+  SKIPPED
+  CANCELLED
+}
+
 model Account {
   id           String  @id @default(uuid())
   businessName String?
@@ -41,6 +57,7 @@ model User {
   resetToken          String?
   resetTokenExpiresAt DateTime?
   createdAt           DateTime      @default(now())
+  followUps           FollowUp[]
 }
 
 model ManagedUser {
@@ -89,6 +106,7 @@ model Response {
   submittedAt DateTime         @default(now())
   form        Form             @relation(fields: [formId], references: [id], onDelete: Cascade)
   answers     ResponseAnswer[]
+  followUps   FollowUp[]
 }
 
 model ResponseAnswer {
@@ -99,4 +117,18 @@ model ResponseAnswer {
 
   response Response  @relation(fields: [responseId], references: [id], onDelete: Cascade)
   field    FormField @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+}
+
+model FollowUp {
+  id               String         @id @default(uuid())
+  responseId       String
+  addedByUserId    String
+  note             String?
+  type             FollowUpType   @default(NOTE)
+  status           FollowUpStatus @default(PENDING)
+  businessStatus   String         @default("Client will call")
+  nextFollowUpDate DateTime?
+  createdAt        DateTime       @default(now())
+  response         Response       @relation(fields: [responseId], references: [id], onDelete: Cascade)
+  addedBy          User           @relation(fields: [addedByUserId], references: [id], onDelete: Cascade)
 }

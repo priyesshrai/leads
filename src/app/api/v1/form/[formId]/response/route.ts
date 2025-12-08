@@ -180,7 +180,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
             { success: true, responseId: result.id },
             { status: 201, headers }
         );
-        
+
     } catch (err: any) {
         console.error("Submit error:", err);
         return NextResponse.json(
@@ -219,6 +219,18 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
                     orderBy: { submittedAt: "desc" },
                     include: {
                         answers: true,
+                        followUps: {
+                            orderBy: { createdAt: "desc" },
+                            include: {
+                                addedBy: {
+                                    select: {
+                                        id: true,
+                                        name: true,
+                                        email: true,
+                                    }
+                                },
+                            }
+                        },
                     },
                 },
             },
@@ -259,12 +271,20 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
 
                 answerMap[field?.label || ans.fieldId] = value;
             }
+            const followUps = res.followUps;
+            const lastFollowUp = followUps[0] ?? null;
+            const nextFollowUpDate = followUps.find(f => f.nextFollowUpDate)?.nextFollowUpDate ?? null;
 
             return {
                 idx: idx + 1,
                 responseId: res.id,
                 submittedAt: res.submittedAt,
                 answers: answerMap,
+                followUps,
+                followUpCount: followUps.length,
+                lastFollowUp,
+                nextFollowUpDate,
+                leadStatus: lastFollowUp?.status ?? "PENDING"
             };
         });
 

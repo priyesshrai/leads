@@ -15,3 +15,25 @@ export const Role = {
 } as const
 
 export type Role = (typeof Role)[keyof typeof Role]
+
+
+export const FollowUpType = {
+  CALL: 'CALL',
+  EMAIL: 'EMAIL',
+  WHATSAPP: 'WHATSAPP',
+  MEETING: 'MEETING',
+  NOTE: 'NOTE',
+  STATUS_CHANGE: 'STATUS_CHANGE'
+} as const
+
+export type FollowUpType = (typeof FollowUpType)[keyof typeof FollowUpType]
+
+
+export const FollowUpStatus = {
+  PENDING: 'PENDING',
+  COMPLETED: 'COMPLETED',
+  SKIPPED: 'SKIPPED',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type FollowUpStatus = (typeof FollowUpStatus)[keyof typeof FollowUpStatus]

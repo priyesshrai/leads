@@ -15,7 +15,7 @@
  * model files in the `model` directory!
  */
 
-import * as runtime from "@prisma/client/runtime/library"
+import * as runtime from "@prisma/client/runtime/client"
 import type * as Prisma from "../models"
 import { type PrismaClient } from "./class"
 
@@ -65,14 +65,6 @@ export type Decimal = runtime.Decimal
 export type DecimalJsLike = runtime.DecimalJsLike
 
 /**
- * Metrics
- */
-export type Metrics = runtime.Metrics
-export type Metric<T> = runtime.Metric<T>
-export type MetricHistogram = runtime.MetricHistogram
-export type MetricHistogramBucket = runtime.MetricHistogramBucket
-
-/**
 * Extensions
 */
 export type Extension = runtime.Types.Extensions.UserArgs
@@ -88,12 +80,12 @@ export type PrismaVersion = {
 }
 
 /**
- * Prisma Client JS version: 6.19.0
- * Query Engine version: 2ba551f319ab1df4bc874a89965d8b3641056773
+ * Prisma Client JS version: 7.0.1
+ * Query Engine version: f09f2815f091dbba658cdcd2264306d88bb5bda6
  */
 export const prismaVersion: PrismaVersion = {
-  client: "6.19.0",
-  engine: "2ba551f319ab1df4bc874a89965d8b3641056773"
+  client: "7.0.1",
+  engine: "f09f2815f091dbba658cdcd2264306d88bb5bda6"
 }
 
 /**
@@ -110,28 +102,30 @@ export type InputJsonValue = runtime.InputJsonValue
 
 
 export const NullTypes = {
-  DbNull: runtime.objectEnumValues.classes.DbNull as (new (secret: never) => typeof runtime.objectEnumValues.instances.DbNull),
-  JsonNull: runtime.objectEnumValues.classes.JsonNull as (new (secret: never) => typeof runtime.objectEnumValues.instances.JsonNull),
-  AnyNull: runtime.objectEnumValues.classes.AnyNull as (new (secret: never) => typeof runtime.objectEnumValues.instances.AnyNull),
+  DbNull: runtime.NullTypes.DbNull as (new (secret: never) => typeof runtime.DbNull),
+  JsonNull: runtime.NullTypes.JsonNull as (new (secret: never) => typeof runtime.JsonNull),
+  AnyNull: runtime.NullTypes.AnyNull as (new (secret: never) => typeof runtime.AnyNull),
 }
 /**
  * Helper for filtering JSON entries that have `null` on the database (empty on the db)
  *
  * @see https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-on-a-json-field
  */
-export const DbNull = runtime.objectEnumValues.instances.DbNull
+export const DbNull = runtime.DbNull
+
 /**
  * Helper for filtering JSON entries that have JSON `null` values (not empty on the db)
  *
  * @see https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-on-a-json-field
  */
-export const JsonNull = runtime.objectEnumValues.instances.JsonNull
+export const JsonNull = runtime.JsonNull
+
 /**
  * Helper for filtering JSON entries that are `Prisma.DbNull` or `Prisma.JsonNull`
  *
  * @see https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-on-a-json-field
  */
-export const AnyNull = runtime.objectEnumValues.instances.AnyNull
+export const AnyNull = runtime.AnyNull
 
 
 type SelectAndInclude = {
@@ -396,7 +390,8 @@ export const ModelName = {
   Form: 'Form',
   FormField: 'FormField',
   Response: 'Response',
-  ResponseAnswer: 'ResponseAnswer'
+  ResponseAnswer: 'ResponseAnswer',
+  FollowUp: 'FollowUp'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -412,7 +407,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "account" | "user" | "managedUser" | "form" | "formField" | "response" | "responseAnswer"
+    modelProps: "account" | "user" | "managedUser" | "form" | "formField" | "response" | "responseAnswer" | "followUp"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -934,6 +929,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    FollowUp: {
+      payload: Prisma.$FollowUpPayload<ExtArgs>
+      fields: Prisma.FollowUpFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.FollowUpFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FollowUpPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.FollowUpFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FollowUpPayload>
+        }
+        findFirst: {
+          args: Prisma.FollowUpFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FollowUpPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.FollowUpFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FollowUpPayload>
+        }
+        findMany: {
+          args: Prisma.FollowUpFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FollowUpPayload>[]
+        }
+        create: {
+          args: Prisma.FollowUpCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FollowUpPayload>
+        }
+        createMany: {
+          args: Prisma.FollowUpCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.FollowUpCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FollowUpPayload>[]
+        }
+        delete: {
+          args: Prisma.FollowUpDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FollowUpPayload>
+        }
+        update: {
+          args: Prisma.FollowUpUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FollowUpPayload>
+        }
+        deleteMany: {
+          args: Prisma.FollowUpDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.FollowUpUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.FollowUpUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FollowUpPayload>[]
+        }
+        upsert: {
+          args: Prisma.FollowUpUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FollowUpPayload>
+        }
+        aggregate: {
+          args: Prisma.FollowUpAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateFollowUp>
+        }
+        groupBy: {
+          args: Prisma.FollowUpGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FollowUpGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.FollowUpCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FollowUpCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1058,6 +1127,21 @@ export const ResponseAnswerScalarFieldEnum = {
 } as const
 
 export type ResponseAnswerScalarFieldEnum = (typeof ResponseAnswerScalarFieldEnum)[keyof typeof ResponseAnswerScalarFieldEnum]
+
+
+export const FollowUpScalarFieldEnum = {
+  id: 'id',
+  responseId: 'responseId',
+  addedByUserId: 'addedByUserId',
+  note: 'note',
+  type: 'type',
+  status: 'status',
+  businessStatus: 'businessStatus',
+  nextFollowUpDate: 'nextFollowUpDate',
+  createdAt: 'createdAt'
+} as const
+
+export type FollowUpScalarFieldEnum = (typeof FollowUpScalarFieldEnum)[keyof typeof FollowUpScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1185,6 +1269,34 @@ export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel,
 
 
 /**
+ * Reference to a field of type 'FollowUpType'
+ */
+export type EnumFollowUpTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FollowUpType'>
+    
+
+
+/**
+ * Reference to a field of type 'FollowUpType[]'
+ */
+export type ListEnumFollowUpTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FollowUpType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'FollowUpStatus'
+ */
+export type EnumFollowUpStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FollowUpStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'FollowUpStatus[]'
+ */
+export type ListEnumFollowUpStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FollowUpStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'Float'
  */
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -1204,26 +1316,22 @@ export type BatchPayload = {
   count: number
 }
 
-
-export type Datasource = {
-  url?: string
-}
-export type Datasources = {
-  db?: Datasource
-}
-
 export const defineExtension = runtime.Extensions.defineExtension as unknown as runtime.Types.Extensions.ExtendsHook<"define", TypeMapCb, runtime.Types.Extensions.DefaultArgs>
 export type DefaultPrismaClient = PrismaClient
 export type ErrorFormat = 'pretty' | 'colorless' | 'minimal'
-export interface PrismaClientOptions {
+export type PrismaClientOptions = ({
   /**
-   * Overwrites the datasource url from your schema.prisma file
+   * Instance of a Driver Adapter, e.g., like one provided by `@prisma/adapter-pg`.
    */
-  datasources?: Datasources
+  adapter: runtime.SqlDriverAdapterFactory
+  accelerateUrl?: never
+} | {
   /**
-   * Overwrites the datasource url from your schema.prisma file
+   * Prisma Accelerate URL allowing the client to connect through Accelerate instead of a direct database.
    */
-  datasourceUrl?: string
+  accelerateUrl: string
+  adapter?: never
+}) & {
   /**
    * @default "colorless"
    */
@@ -1264,10 +1372,6 @@ export interface PrismaClientOptions {
     isolationLevel?: TransactionIsolationLevel
   }
   /**
-   * Instance of a Driver Adapter, e.g., like one provided by `@prisma/adapter-planetscale`
-   */
-  adapter?: runtime.SqlDriverAdapterFactory | null
-  /**
    * Global configuration for omitting model fields by default.
    * 
    * @example
@@ -1291,6 +1395,7 @@ export type GlobalOmitConfig = {
   formField?: Prisma.FormFieldOmit
   response?: Prisma.ResponseOmit
   responseAnswer?: Prisma.ResponseAnswerOmit
+  followUp?: Prisma.FollowUpOmit
 }
 
 /* Types for Logging */
