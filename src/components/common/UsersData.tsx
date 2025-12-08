@@ -207,7 +207,7 @@ export default function UsersData({ formId }: { formId: string }) {
                 headerName: "Status",
                 width: 140,
                 sortable: true,
-                renderCell: (params : GridRenderCellParams) => {
+                renderCell: (params: GridRenderCellParams) => {
                     const status = params.row.leadStatus;
                     const color =
                         status === "COMPLETED"
@@ -296,10 +296,11 @@ export default function UsersData({ formId }: { formId: string }) {
     return (
         <div className="w-full">
             <div className="flex justify-between items-center mb-5">
-                <h1 className="font-bold text-zinc-800 text-xl">{data?.title ? `User Data of ${data.title}` : "Responses"}</h1>
+                <h1 className="font-bold text-zinc-800 text-xl">{data?.title ? `Responses of ${data.title}` : "Responses"}</h1>
             </div>
 
             <DataGrid
+                showToolbar
                 rows={responses}
                 columns={columns}
                 getRowId={(row) => row.responseId}
