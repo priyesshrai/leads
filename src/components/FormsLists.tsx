@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useQuery } from "@tanstack/react-query";
 import Spinner from "./ui/spinner";
 import Link from "next/link";
@@ -56,7 +56,7 @@ export default function FormsList({ accountId }: { accountId?: string }) {
     const [page, setPage] = useState(1);
     const limit = 10;
 
-    const { data, isLoading, isError } = useQuery({
+    const { data, isLoading, isError, error } = useQuery({
         queryKey: ["forms", page, limit, accountId],
         queryFn: () => fetchForms(page, limit, accountId ?? ''),
         placeholderData: (prev) => prev,
@@ -66,29 +66,35 @@ export default function FormsList({ accountId }: { accountId?: string }) {
     const forms = data?.response?.forms ?? [];
     const pagination = data?.response;
 
+    if (isLoading) {
+        return (
+            <div className="w-full flex justify-center py-20">
+                <Spinner />
+            </div>
+        );
+    }
+
+    if (isError) {
+        const errMsg = (error as AxiosError<{ error: string }>)?.response?.data?.error ??
+            "Something went wrong.";
+
+        return (
+            <p className="text-red-500 text-center py-10 text-lg font-medium">
+                {errMsg}
+            </p>
+        );
+    }
+    if (forms.length === 0) {
+        return (
+            <p className="text-gray-500 text-center py-20 text-xl font-medium">
+                No forms found. Create a new one.
+            </p>
+        );
+    }
     return (
         <div className="relative w-full flex flex-col gap-8">
-
-            {isLoading && (
-                <div className="w-full flex justify-center py-20">
-                    <Spinner />
-                </div>
-            )}
-
-            {isError && (
-                <p className="text-red-500 text-center py-5 text-lg font-medium">
-                    Failed to load forms.
-                </p>
-            )}
-
-            {!isLoading && forms.length === 0 && (
-                <p className="text-gray-500 text-center py-20 text-xl font-medium">
-                    No forms found. Create a new one.
-                </p>
-            )}
-
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {forms.map((form:FormItem) => (
+                {forms.map((form: FormItem) => (
                     <div
                         key={form.id}
                         className="relative rounded-2xl bg-white p-6 shadow-md border border-zinc-200 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex flex-col gap-4"

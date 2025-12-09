@@ -1,5 +1,7 @@
+"use server";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
+import prisma from "./prisma";
 
 const JWT_SECRET = process.env.JWT_SECRET!;
 
@@ -25,6 +27,14 @@ export async function verifyRole(allowedRoles: string[] | string) {
 
         if (!rolesArray.includes(decoded.role)) {
             throw new Error(`Unauthorized: Allowed roles are ${rolesArray.join(", ")}`);
+        }
+
+        const user = await prisma.user.findUnique({
+            where: { email: decoded.email },
+        });
+
+        if (!user) {
+            throw new Error("User not found");
         }
 
         return decoded;
