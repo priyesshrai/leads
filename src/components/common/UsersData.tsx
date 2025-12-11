@@ -31,13 +31,21 @@ import {
     Alert,
     Chip,
 } from "@mui/material";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 
 import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
 import EmailIcon from "@mui/icons-material/Email";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import EventIcon from "@mui/icons-material/Event";
 import NoteIcon from "@mui/icons-material/Note";
-
 import toast from "react-hot-toast";
 import Spinner from "../ui/spinner";
 
@@ -115,6 +123,13 @@ export default function UsersData({ formId }: { formId: string }) {
     const STORAGE_KEY = `form_${formId}_column_visibility`;
     const queryClient = useQueryClient();
     const hasFormId = !!formId;
+    const allState: string[] = [
+        "All",
+        "Pending",
+        "Completed",
+        "Cancelled",
+    ]
+    const [currentState, setCurrentState] = useState<string>(allState[1])
     const [followType, setFollowType] = useState<string>("NOTE");
     const [followNote, setFollowNote] = useState<string>("");
     const [followNextDate, setFollowNextDate] = useState<string>("");
@@ -145,11 +160,11 @@ export default function UsersData({ formId }: { formId: string }) {
     }, [openResponse]);
 
 
-    const { data, isLoading } = useQuery<FormResponsesData>({
-        queryKey: ["form_responses", formId, paginationModel.page, paginationModel.pageSize],
+    const { data, isLoading, isError } = useQuery<FormResponsesData>({
+        queryKey: ["form_responses", formId, paginationModel.page, paginationModel.pageSize, currentState],
         queryFn: async () => {
             const res = await axios.get(`/api/v1/form/${formId}/response`, {
-                params: { page: paginationModel.page + 1, limit: paginationModel.pageSize },
+                params: { page: paginationModel.page + 1, limit: paginationModel.pageSize, state: currentState },
                 withCredentials: true,
             });
             return res.data;
@@ -297,6 +312,27 @@ export default function UsersData({ formId }: { formId: string }) {
         <div className="w-full">
             <div className="flex justify-between items-center mb-5">
                 <h1 className="font-bold text-zinc-800 text-xl">{data?.title ? `Responses of ${data.title}` : "Responses"}</h1>
+            </div>
+
+            <div className="relative my-5 w-full flex items-center justify-end p-3">
+                <Select
+                    onValueChange={(val) => setCurrentState(val)}
+                    defaultValue={currentState}
+                >
+                    <SelectTrigger className="w-xs bg-white border-gray-300">
+                        <SelectValue placeholder={currentState} />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white border-gray-300">
+                        <SelectGroup>
+                            <SelectLabel>States</SelectLabel>
+                            {allState.map((state, idx) => (
+                                <SelectItem key={idx} value={state}>
+                                    {state}
+                                </SelectItem>
+                            ))}
+                        </SelectGroup>
+                    </SelectContent>
+                </Select>
             </div>
 
             <DataGrid

@@ -202,12 +202,16 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
             );
         }
 
-        await verifyRole(["ADMIN", "SUPERADMIN"])
+        await verifyRole(["ADMIN", "SUPERADMIN"]);
         const { searchParams } = new URL(req.url);
         const page = Math.max(Number(searchParams.get("page")) || 1, 1);
         const limit = Math.min(Math.max(Number(searchParams.get("limit")) || 20, 1), 50);
         const skip = (page - 1) * limit;
         const { formId } = await params;
+
+        let state = (searchParams.get("state") || "Pending").toLowerCase();
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
 
         const form = await prisma.form.findUnique({
             where: { id: formId },
@@ -223,28 +227,58 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
                             orderBy: { createdAt: "desc" },
                             include: {
                                 addedBy: {
-                                    select: {
-                                        id: true,
-                                        name: true,
-                                        email: true,
-                                    }
-                                },
+                                    select: { id: true, name: true, email: true }
+                                }
                             }
-                        },
-                    },
-                },
-            },
+                        }
+                    }
+                }
+            }
         });
 
         if (!form) {
             return NextResponse.json({ error: "Form not found" }, { status: 404 });
         }
 
-        const responseCount = await prisma.response.count({
-            where: {
-                formId: formId
+        const allResponses = await prisma.response.findMany({
+            where: { formId },
+            include: {
+                followUps: {
+                    orderBy: { createdAt: "desc" }
+                }
             }
-        })
+        });
+
+        const filteredResponseIds = allResponses
+            .filter(res => {
+                const lastFollowUp = res.followUps[0] || null;
+
+                if (!lastFollowUp) return state === "all";
+
+                const nextDate = lastFollowUp.nextFollowUpDate
+                    ? new Date(lastFollowUp.nextFollowUpDate)
+                    : null;
+
+                switch (state) {
+                    case "pending":
+                        return (
+                            lastFollowUp.status === "PENDING" &&
+                            nextDate &&
+                            nextDate <= today
+                        );
+                    case "completed":
+                        return lastFollowUp.status === "COMPLETED";
+                    case "cancelled":
+                        return lastFollowUp.status === "CANCELLED";
+                    case "all":
+                        return true;
+                    default:
+                        return true;
+                }
+            })
+            .map(r => r.id);
+
+        const responseCount = filteredResponseIds.length;
 
         if (responseCount === 0) {
             return NextResponse.json(
@@ -253,24 +287,40 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
             );
         }
 
-        const formatted = form.responses.map((res, idx) => {
+        const paginatedResponses = await prisma.response.findMany({
+            where: { id: { in: filteredResponseIds } },
+            skip,
+            take: limit,
+            orderBy: { submittedAt: "desc" },
+            include: {
+                answers: true,
+                followUps: {
+                    orderBy: { createdAt: "desc" },
+                    include: {
+                        addedBy: {
+                            select: { id: true, name: true, email: true }
+                        }
+                    }
+                }
+            }
+        });
+
+        const formatted = paginatedResponses.map((res, idx) => {
             const answerMap: Record<string, any> = {};
 
             for (const ans of res.answers) {
                 const field = form.fields.find((f) => f.id === ans.fieldId);
-
                 let value = ans.value;
 
-                if (value && value.startsWith("[") && value.endsWith("]")) {
+                if (value?.startsWith("[") && value.endsWith("]")) {
                     try {
                         value = JSON.parse(value);
-                    } catch {
-                        console.log("error");
-                    }
+                    } catch { }
                 }
 
                 answerMap[field?.label || ans.fieldId] = value;
             }
+
             const followUps = res.followUps;
             const lastFollowUp = followUps[0] ?? null;
             const nextFollowUpDate = followUps.find(f => f.nextFollowUpDate)?.nextFollowUpDate ?? null;
@@ -288,10 +338,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
             };
         });
 
-
         const pageCount = Math.ceil(responseCount / limit);
 
-        const res = {
+        return NextResponse.json({
             id: form.id,
             formId: form.formsId,
             title: form.title,
@@ -304,8 +353,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
             hasMore: page < pageCount,
             nextPage: page < pageCount ? page + 1 : null,
             prevPage: page > 1 ? page - 1 : null,
-        }
-        return NextResponse.json(res, { status: 200 });
+        }, { status: 200 });
+
     } catch (error: any) {
         console.error("Retrieve error:", error);
         return NextResponse.json(
