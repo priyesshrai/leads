@@ -143,62 +143,78 @@ export async function GET(req: NextRequest) {
         }
 
         const { searchParams } = new URL(req.url);
-
-        const state = (searchParams.get("state") || "Pending").toLowerCase();
+        const state = (searchParams.get("state") || "pending").toLowerCase();
 
         const page = Math.max(Number(searchParams.get("page")) || 1, 1);
         const limit = Math.min(Math.max(Number(searchParams.get("limit")) || 20, 1), 50);
         const skip = (page - 1) * limit;
 
         const now = new Date();
-        const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
-        const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+        const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
 
-        const statusFilter: any = {};
-        if (state === "pending") {
-            statusFilter.status = "PENDING";
-        } else if (state === "completed") {
-            statusFilter.status = "COMPLETED";
-        } else if (state === "cancelled") {
-            statusFilter.status = "CANCELLED";
-        }
-
-        const allFollowUps = await prisma.followUp.findMany({
-            where: {
-                addedByUserId: user.id,
-                nextFollowUpDate: { gte: startOfDay, lte: endOfDay },
-                ...statusFilter,
-            },
-            orderBy: [
-                { responseId: "asc" },
-                { createdAt: "desc" }
-            ],
+        const rawFollowUps = await prisma.followUp.findMany({
+            where: { addedByUserId: user.id },
+            orderBy: { createdAt: "desc" },
             include: {
                 addedBy: { select: { id: true, name: true, email: true } },
                 response: {
-                    include: { answers: true }
+                    include: {
+                        answers: {
+                            include:{
+                                field:{
+                                    select:{
+                                        label:true
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         });
 
-        const seenResponseIds = new Set<string>();
-        const followUps = allFollowUps.filter(fu => {
-            if (seenResponseIds.has(fu.responseId)) {
-                return false;
+        const latestMap = new Map<string, (typeof rawFollowUps)[0]>();
+
+        for (const fu of rawFollowUps) {
+            if (!latestMap.has(fu.responseId)) {
+                latestMap.set(fu.responseId, fu);
             }
-            seenResponseIds.add(fu.responseId);
-            return true;
+        }
+
+        const filtered = Array.from(latestMap.values()).filter((fu) => {
+            const latestStatus = fu.status;
+            const nextDate = fu.nextFollowUpDate ? new Date(fu.nextFollowUpDate) : null;
+
+            switch (state) {
+                case "pending":
+                    return (
+                        latestStatus === "PENDING" &&
+                        nextDate &&
+                        nextDate <= endOfToday
+                    );
+
+                case "completed":
+                    return latestStatus === "COMPLETED";
+
+                case "cancelled":
+                    return latestStatus === "CANCELLED";
+
+                case "all":
+                    return true;
+
+                default:
+                    return false;
+            }
         });
 
-        const total = seenResponseIds.size;
-        const paginatedFollowUps = followUps.slice(skip, skip + limit);
-
+        const total = filtered.length;
+        const paginated = filtered.slice(skip, skip + limit);
         const pageCount = Math.ceil(total / limit);
 
         return NextResponse.json(
             {
                 success: true,
-                today: paginatedFollowUps,
+                today: paginated,
                 page,
                 limit,
                 total,
