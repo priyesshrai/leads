@@ -2,26 +2,30 @@ import prisma from "@/src/lib/prisma";
 import { verifyRole } from "@/src/lib/verifyRole";
 
 export async function getAuthUser() {
-    const user = await verifyRole(["SUPERADMIN", "ADMIN"]);
-    if (!user) return null;
+    try {
+        const user = await verifyRole(["SUPERADMIN", "ADMIN"]);
+        if (!user) return null;
 
-    const dbUser = await prisma.user.findFirst({
-        where: { email: user.email },
-        select: {
-            id: true,
-            name: true,
-            email: true,
-            account: true,
-            accountId: true,
-        },
-    });
+        const dbUser = await prisma.user.findFirst({
+            where: { email: user.email },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                account: true,
+                accountId: true,
+            },
+        });
 
-    if (!dbUser) return null;
+        if (!dbUser) return null;
 
-    return {
-        ...dbUser,
-        initials: generateNameInitials(dbUser.name),
-    };
+        return {
+            ...dbUser,
+            initials: generateNameInitials(dbUser.name),
+        };
+    } catch (error: any) {
+        return null;
+    }
 }
 
 function generateNameInitials(name?: string | null): string {

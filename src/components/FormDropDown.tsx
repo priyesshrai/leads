@@ -93,13 +93,13 @@ export default function FormDropDown({ formData }: Props) {
 
                     <DropdownMenuItem asChild className="cursor-pointer hover:bg-gray-100">
                         <Link
-                            href={`forms/view?id=${formData.id}`}
+                            href={`?view=${formData.id}`}
                             className="flex items-center justify-between"
-                            title="View Form Response"
                         >
-                            Form Response
+                            View Form
                             <EyeIcon size={14} className="text-zinc-700" />
                         </Link>
+                        
                     </DropdownMenuItem>
 
                     <DropdownMenuItem asChild className="cursor-pointer hover:bg-gray-100">
