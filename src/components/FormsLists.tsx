@@ -129,10 +129,11 @@ export default function FormsList({ accountId }: { accountId?: string }) {
                             <FormDropDown formData={form} />
 
                             <Link
-                                href={`?view=${form.id}`}
+                                href={`forms/view?id=${form.id}`}
                                 className="inline-flex items-center gap-2 text-blue-600 font-medium text-sm hover:underline group w-max"
+                                title="View Form Response"
                             >
-                                View Form
+                                Form Response
                                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-all" />
                             </Link>
                         </div>
