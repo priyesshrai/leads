@@ -210,8 +210,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
         const { formId } = await params;
 
         let state = (searchParams.get("state") || "Pending").toLowerCase();
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        const now = new Date();
+        const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+        const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+
 
         const form = await prisma.form.findUnique({
             where: { id: formId },
@@ -264,7 +266,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ form
                         return (
                             lastFollowUp.status === "PENDING" &&
                             nextDate &&
-                            nextDate <= today
+                            nextDate <= endOfToday
                         );
                     case "completed":
                         return lastFollowUp.status === "COMPLETED";

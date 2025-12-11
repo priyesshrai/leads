@@ -134,67 +134,84 @@ export async function GET(req: NextRequest) {
     try {
         const ip = req.headers.get("x-forwarded-for") || "unknown";
         if (isRateLimited(ip)) {
-            return NextResponse.json(
-                { error: "Too many requests. Try again later." },
-                { status: 429 }
-            );
+            return NextResponse.json({ error: "Too many requests. Try again later." }, { status: 429 });
         }
 
         const user = await verifyRole(["ADMIN", "SUPERADMIN"]);
         if (!user) {
-            return NextResponse.json(
-                { error: "Unauthorized" },
-                { status: 401 }
-            );
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
+        const { searchParams } = new URL(req.url);
+
+        const state = (searchParams.get("state") || "Pending").toLowerCase();
+
+        const page = Math.max(Number(searchParams.get("page")) || 1, 1);
+        const limit = Math.min(Math.max(Number(searchParams.get("limit")) || 20, 1), 50);
+        const skip = (page - 1) * limit;
+
         const now = new Date();
+        const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+        const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
 
-        const startOfDay = new Date(
-            now.getFullYear(),
-            now.getMonth(),
-            now.getDate(),
-            0, 0, 0, 0
-        );
+        const statusFilter: any = {};
+        if (state === "pending") {
+            statusFilter.status = "PENDING";
+        } else if (state === "completed") {
+            statusFilter.status = "COMPLETED";
+        } else if (state === "cancelled") {
+            statusFilter.status = "CANCELLED";
+        }
 
-        const endOfDay = new Date(
-            now.getFullYear(),
-            now.getMonth(),
-            now.getDate(),
-            23, 59, 59, 999
-        );
-
-        const followUps = await prisma.followUp.findMany({
+        const allFollowUps = await prisma.followUp.findMany({
             where: {
                 addedByUserId: user.id,
-                nextFollowUpDate: {
-                    gte: startOfDay,
-                    lte: endOfDay,
-                },
+                nextFollowUpDate: { gte: startOfDay, lte: endOfDay },
+                ...statusFilter,
             },
+            orderBy: [
+                { responseId: "asc" },
+                { createdAt: "desc" }
+            ],
             include: {
+                addedBy: { select: { id: true, name: true, email: true } },
                 response: {
-                    include: {
-                        answers: true,
-                    },
-                },
-                addedBy: {
-                    select: { id: true, name: true, email: true },
-                },
-            },
-            orderBy: { nextFollowUpDate: "asc" },
+                    include: { answers: true }
+                }
+            }
         });
 
+        const seenResponseIds = new Set<string>();
+        const followUps = allFollowUps.filter(fu => {
+            if (seenResponseIds.has(fu.responseId)) {
+                return false;
+            }
+            seenResponseIds.add(fu.responseId);
+            return true;
+        });
+
+        const total = seenResponseIds.size;
+        const paginatedFollowUps = followUps.slice(skip, skip + limit);
+
+        const pageCount = Math.ceil(total / limit);
+
         return NextResponse.json(
-            { success: true, today: followUps },
+            {
+                success: true,
+                today: paginatedFollowUps,
+                page,
+                limit,
+                total,
+                pageCount,
+                hasMore: page < pageCount,
+                nextPage: page < pageCount ? page + 1 : null,
+                prevPage: page > 1 ? page - 1 : null,
+            },
             { status: 200 }
         );
 
     } catch (error: any) {
         console.error("Fetch Today's FollowUps Error:", error.message);
-        return NextResponse.json(
-            { error: "Internal Server Error" },
-            { status: 500 }
-        );
+        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }
