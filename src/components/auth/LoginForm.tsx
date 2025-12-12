@@ -59,7 +59,7 @@ export default function LoginForm() {
                 type="email"
                 name="email"
                 label="Email"
-                placeholder="Enter Email"
+                placeholder="priyeshrai369@gmail.com"
                 leftIcon={<Mail size={18} />}
                 onChange={handleChange}
                 error={isError}
@@ -70,7 +70,7 @@ export default function LoginForm() {
                 type={showPassword ? "text" : "password"}
                 name="password"
                 label="Password"
-                placeholder="Enter Password"
+                placeholder="Priyesshrai1@"
                 rightIcon={
                     showPassword ? (
                         <EyeOff size={18} onClick={() => setShowPassword(false)} />
@@ -81,6 +81,9 @@ export default function LoginForm() {
                 onChange={handleChange}
                 error={isError}
             />
+            <span className='text-sm block max-w-xs'>
+                To test the system login with placeholder email & password
+            </span>
             <Link href='/forget-password' className='ml-auto text-blue-400 '>
                 Forget password?
             </Link>
