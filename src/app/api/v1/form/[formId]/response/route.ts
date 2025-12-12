@@ -1,4 +1,5 @@
 import { v2 as cloudinary } from "cloudinary";
+import { FollowUpStatus, FollowUpType } from "@/src/app/generated/prisma/enums";
 import { NextRequest, NextResponse } from "next/server";
 import { isRateLimited } from "@/src/lib/limiter";
 import prisma from "@/src/lib/prisma";
@@ -170,6 +171,23 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ for
             }
 
             return response;
+        });
+
+        const followup = await prisma.followUp.create({
+            data: {
+                responseId: result.id,
+                addedByUserId: form.userId,
+                type: FollowUpType.STATUS_CHANGE,
+                note: "Auto Follow up add by the System.",
+                nextFollowUpDate: new Date(),
+                businessStatus: "Call Client",
+                status: FollowUpStatus.PENDING,
+            },
+            include: {
+                addedBy: {
+                    select: { id: true, name: true, email: true },
+                },
+            },
         });
 
         if (form.account?.email) {
