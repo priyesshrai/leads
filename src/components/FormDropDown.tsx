@@ -44,7 +44,7 @@ export default function FormDropDown({ formData }: Props) {
         if (!formId) {
             return toast.error("Unable to copy link...! try after some time")
         }
-        const link = `https://forms.wizards.co.in/${formId}/submit`
+        const link = `https://response-form-nine.vercel.app/${formId}/submit`
         navigator.clipboard.writeText(link)
         setCopyLoading(false);
         return toast("Copied...!")
