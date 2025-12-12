@@ -142,6 +142,15 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
+        const userAccount = await prisma.user.findUnique({
+            where: { id: user.id },
+            select: { accountId: true, role: true }
+        });
+
+        if (!userAccount?.accountId) {
+            return NextResponse.json({ error: "User account not found" }, { status: 404 });
+        }
+
         const { searchParams } = new URL(req.url);
         const state = (searchParams.get("state") || "pending").toLowerCase();
 
@@ -153,17 +162,23 @@ export async function GET(req: NextRequest) {
         const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
 
         const rawFollowUps = await prisma.followUp.findMany({
-            where: { addedByUserId: user.id },
+            where: {
+                response: {
+                    form: {
+                        accountId: userAccount.accountId,
+                    },
+                },
+            },
             orderBy: { createdAt: "desc" },
             include: {
                 addedBy: { select: { id: true, name: true, email: true } },
                 response: {
                     include: {
                         answers: {
-                            include:{
-                                field:{
-                                    select:{
-                                        label:true
+                            include: {
+                                field: {
+                                    select: {
+                                        label: true
                                     }
                                 }
                             }

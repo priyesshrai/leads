@@ -62,6 +62,13 @@ export default function DashboardComponent() {
                     </div>
                 )
             }
+            {
+                data && data.total === 0 && (
+                    <div className="w-full flex justify-center py-20">
+                        No Data Available for today
+                    </div>
+                )
+            }
 
             <div className='relative w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
                 {data?.today.map(item => (
